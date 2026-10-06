@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "firefox": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mozilla/firefox-devtools-mcp@0.10.4",
+        "--viewport",
+        "1280x720"
+      ]
+    }
+  }
+}

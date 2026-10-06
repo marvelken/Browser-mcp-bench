@@ -9,6 +9,7 @@ const APP_DIR = join(ROOT, 'app');
 const RAW_DIR = join(ROOT, 'results', 'raw');
 const MCP_DIR = join(ROOT, 'harness', 'mcp-configs');
 const SANDBOX_BASE = join(process.env.HOME, 'mcp-bench-sandbox');
+const CLAUDE_BIN = join(process.env.HOME, '.claude', 'local', 'node_modules', '.bin', 'claude');
 
 mkdirSync(RAW_DIR, { recursive: true });
 mkdirSync(SANDBOX_BASE, { recursive: true });
@@ -277,8 +278,7 @@ async function runOne(run) {
   const startTime = Date.now();
 
   return new Promise((resolve) => {
-    const outStream = createWriteStream(outPath);
-    const proc = spawn('claude', args, {
+    const proc = spawn(CLAUDE_BIN, args, {
       cwd: sandboxDir,
       stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env, FORCE_COLOR: '0' },
@@ -286,22 +286,23 @@ async function runOne(run) {
 
     let finished = false;
     let hitRateLimit = false;
-    let lastEventType = '';
+    const stdoutChunks = [];
 
-    const rl = createInterface({ input: proc.stdout });
-    rl.on('line', (line) => {
-      outStream.write(line + '\n');
-      try {
-        const evt = JSON.parse(line);
-        lastEventType = evt.type || '';
-        if (evt.type === 'result') {
-          finished = true;
-        }
-        // Check for rate limit
-        if (evt.type === 'error' && /rate.limit|overloaded/i.test(JSON.stringify(evt))) {
-          hitRateLimit = true;
-        }
-      } catch {}
+    proc.stdout.on('data', (chunk) => {
+      stdoutChunks.push(chunk);
+      const text = chunk.toString();
+      for (const line of text.split('\n')) {
+        if (!line.trim()) continue;
+        try {
+          const evt = JSON.parse(line);
+          if (evt.type === 'result') {
+            finished = true;
+          }
+          if (evt.type === 'error' && /rate.limit|overloaded/i.test(JSON.stringify(evt))) {
+            hitRateLimit = true;
+          }
+        } catch {}
+      }
     });
 
     proc.stderr.on('data', (data) => {
@@ -320,7 +321,8 @@ async function runOne(run) {
 
     proc.on('close', (code) => {
       clearTimeout(timer);
-      outStream.end();
+      const output = Buffer.concat(stdoutChunks).toString();
+      writeFileSync(outPath, output);
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`  ${run.id} done in ${elapsed}s (code=${code}, finished=${finished}, rateLimit=${hitRateLimit})`);
 
@@ -396,14 +398,14 @@ async function smokeTest() {
     const startTime = Date.now();
 
     await new Promise((resolve) => {
-      const outStream = createWriteStream(outPath);
-      const proc = spawn('claude', args, {
+      const chunks = [];
+      const proc = spawn(CLAUDE_BIN, args, {
         cwd: sandboxDir,
         stdio: ['pipe', 'pipe', 'pipe'],
       });
 
-      const rl = createInterface({ input: proc.stdout });
-      rl.on('line', (line) => outStream.write(line + '\n'));
+      proc.stdout.on('data', (chunk) => chunks.push(chunk));
+      proc.stderr.on('data', () => {});
 
       const timer = setTimeout(() => {
         proc.kill('SIGTERM');
@@ -411,7 +413,7 @@ async function smokeTest() {
 
       proc.on('close', () => {
         clearTimeout(timer);
-        outStream.end();
+        writeFileSync(outPath, Buffer.concat(chunks).toString());
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
         console.log(`  Done in ${elapsed}s`);
         resolve();

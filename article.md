@@ -208,6 +208,31 @@ Each row creates ~12 Intl formatters (5 locales x currency + date + relative tim
 ## 5. Fixed cost per MCP
 | Config | Tools exposed | Input tokens on a one-word prompt | Extra tokens vs no MCP |
 | --- | --- | --- | --- |
+| No MCP (baseline) | 0 | 5,807 | 0 |
+| Chrome | 30 | 13,604 | +7,797 |
+| Chrome + React layer A | 32 | 14,001 | +8,194 |
+| Firefox (developer preset) | 48 | 14,014 | +8,207 |
+| Safari | 17 | 9,653 | +3,846 |
+
+All measured with `--tools "" --strict-mcp-config`. Model: claude-opus-4-6.
+
+Chrome tools (30): click, close_page, drag, emulate, evaluate_script, fill, fill_form, get_console_message, get_css_styles, get_network_request, handle_dialog, hover, lighthouse_audit, list_console_messages, list_network_requests, list_pages, navigate_page, new_page, performance_analyze_insight, performance_start_trace, performance_stop_trace, press_key, resize_page, select_page, take_heapsnapshot, take_screenshot, take_snapshot, type_text, upload_file, wait_for.
+
+Chrome + React adds: list_3p_developer_tools, execute_3p_developer_tool.
+
+Firefox developer preset (48): accept_dialog, clear_downloads, clear_snapshot, click_by_uid, close_firefox_session, close_page, dismiss_dialog, drag_by_uid_to_uid, evaluate_script, fill_by_uid, fill_form_by_uid, get_console_messages, get_console_output, get_firefox_info, get_firefox_output, get_network_request, get_page_text, hover_by_uid, install_extension, list_downloads, list_network_requests, list_pages, navigate_history, navigate_page, new_page, press_key, resolve_uid_to_selector, screencast_start, screencast_stop, screenshot_by_uid, screenshot_page, select_page, set_download_behavior, set_viewport_size, take_snapshot, type_text, uninstall_extension, upload_file_by_uid, and more.
+
+Safari (17): browser_console_messages, browser_dialogs, close_tab, create_tab, evaluate_javascript, get_network_request, get_page_content, list_network_requests, list_tabs, navigate_to_url, page_info, page_interactions, screenshot, set_emulated_media, set_viewport_size, switch_tab, wait_for_navigation.
+
+Note: Firefox developer preset showed 0 tools at init in quick smoke (MCP still connecting) but 48 in the fixed-cost test. The server takes longer to start than Chrome or Safari.
+
+### Smoke real runs (bug 3, one per browser, unscored)
+All three correctly diagnosed bug 3 (different API shape for project 5) with high confidence.
+- Chrome: 13 turns, 64s, 158k input + 2k output tokens
+- Safari: 25 turns, 175s, 311k input + 3k output tokens
+- Firefox: 12 turns, 59s, 104k input + 1.4k output tokens
+
+Safari was notably slower (25 turns vs 12-13). Chrome and Firefox both found it quickly.
 
 ## 6. Track A results: browser MCP alone
 | Bug | Browser | Scores per run | Median time | Median turns | Median total tokens | Hit a cap |
