@@ -4,7 +4,7 @@
 
 - **Machine:** Apple M4, 16 GB RAM
 - **OS:** macOS 26.6.2 (Build 25G83)
-- **Safari:** 26.6.2 (21624.5.1.11.3) -- NOT 27+. `safaridriver --mcp` is NOT available.
+- **Safari:** 27.0 (21625.1.29.18.28) -- upgraded from 26.6.2 during Phase 0. `safaridriver --mcp` works.
 - **Chrome:** 154.0.8037.98
 - **Firefox:** 157.0
 - **Node:** v22.14.0
@@ -54,13 +54,34 @@
   - Firefox `basic` preset (default) lacks network/console/profiler. Confirmed. Must use `developer`.
 - `gh` CLI is not installed on this machine. Used WebFetch for all doc fetches.
 
+### [Phase 1] App built
+- Stack: Vite 8.3.2, React 19.3.0, TypeScript 6.0.2
+- React Compiler OFF, StrictMode OFF
+- Mock API: Vite middleware plugin with fixed delays (350 ms stats, 80 ms others)
+- All 4 bugs planted and verified via API:
+  - Bug 1: sequential stats take ~3160 ms (confirmed)
+  - Bug 2: long project name with nowrap + no min-width:0 on flex item
+  - Bug 3: project 5 returns `{data:{...}}` instead of `{revenue,...}` (confirmed)
+  - Bug 4: context provider creates new value object on every render, 300 memo'd rows re-render
+- Three run modes: `npm run dev`, `npm run dev:cdt`, `npm run dev:ard`
+- Installed: react-devtools-cdt-mcp@0.1.0, agent-react-devtools@0.5.0
+- No debug globals, no bug-hinting names, no comments naming bugs
+
+### [Phase 0] Safari upgrade
+- Command: `softwareupdate --install "Safari27.0TahoeAuto-27.0"`
+- Result: PASS
+- Safari upgraded from 26.6.2 to 27.0 (21625.1.29.18.28). No restart needed.
+- `safaridriver --mcp` now works. Clean exit code 0, no error output.
+
 ## 3. Setup notes per tool
 
-### Safari
-- `safaridriver --mcp` does not exist on Safari 26.6.2.
-- `/usr/bin/safaridriver` is a symlink to `/System/Cryptexes/App/usr/bin/safaridriver`.
-- No alternative path works. The `--mcp` flag is simply not in this build.
-- Blocker: need Safari 27+.
+### Safari (safaridriver --mcp, Safari 27.0)
+- Initially Safari 26.6.2. `safaridriver --mcp` returned `unrecognized option '--mcp'`.
+- Upgraded to Safari 27.0 via `softwareupdate --install "Safari27.0TahoeAuto-27.0"` (standalone, no restart).
+- `/usr/bin/safaridriver --mcp` now works. Clean exit, no errors.
+- Config: `{ "command": "/usr/bin/safaridriver", "args": ["--mcp"] }`
+- First action in a session must be a navigation. Other actions before that may return an error.
+- 17 tools exposed (from Apple docs): browser_console_messages, browser_dialogs, close_tab, create_tab, evaluate_javascript, get_network_request, get_page_content, list_network_requests, list_tabs, navigate_to_url, page_info, page_interactions, screenshot, set_emulated_media, set_viewport_size, switch_tab, wait_for_navigation.
 
 ### Chrome (chrome-devtools-mcp 1.10.1)
 - Start: `npx -y chrome-devtools-mcp@1.10.1`
@@ -108,7 +129,80 @@
 - Agent interacts via shell commands like `agent-react-devtools get tree`, `find`, `profile`.
 
 ## 4. Planted bugs
-(to be filled in Phase 1)
+
+### Stack
+- Vite 8.3.2, React 19.3.0, TypeScript 6.0.2
+- React Compiler: OFF (could fix bug 4 by itself)
+- StrictMode: OFF (doubles effects in dev, would muddy network log)
+- Mock API: Vite middleware plugin, fixed 350 ms delay per stats call, 80 ms for other endpoints
+
+### Bug 1: Network waterfall
+**File:** `src/components/CardRow.tsx`
+**Symptom:** Stats take about 3 seconds to appear after page load.
+```typescript
+// CardRow.tsx, load function inside useEffect
+async function load() {
+  const userRes = await fetch('/api/user');
+  await userRes.json();
+  const projRes = await fetch('/api/projects');
+  const projData = await projRes.json();
+  setProjects(projData);
+  const map = {};
+  for (const p of projData) {
+    const statsRes = await fetch(`/api/projects/${p.id}/stats`);
+    const statsData = await statsRes.json();
+    map[p.id] = statsData;
+  }
+  setStatsMap(map);
+}
+```
+Verified: sequential API calls take ~3160 ms. Parallel would take ~350 ms.
+
+### Bug 2: CSS layout break
+**File:** `src/components/ProjectCard.tsx`
+**Symptom:** Page scrolls sideways at 1280x720.
+```typescript
+// ProjectCard.tsx - card container
+<div style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '1rem', background: '#fff' }}>
+  <div style={{ whiteSpace: 'nowrap', fontWeight: 600, fontSize: '1rem' }}>
+    {project.name}  // Project 3: "InfrastructureMonitoringDashboardForProductionServices"
+  </div>
+```
+No `min-width: 0` on the flex item. The long name with `white-space: nowrap` prevents shrinking.
+
+### Bug 3: Console error with hidden cause
+**Files:** `src/api/server.ts` (response), `src/components/StatDisplay.tsx` (crash)
+**Symptom:** One card shows "Something went wrong".
+```typescript
+// server.ts - project 5 returns a different shape
+function makeStatsForProject5() {
+  return { data: { revenue: 68000, users: 1850, growth: 4.2, tickets: 22 } };
+}
+// All other projects return: { revenue, users, growth, tickets }
+
+// StatDisplay.tsx - crashes on undefined
+<div>Growth: {stats.growth.toFixed(1)}%</div>
+// stats.growth is undefined because stats is { data: { ... } }
+```
+
+### Bug 4: Re-render cascade
+**Files:** `src/context/AppContext.tsx` (provider), `src/components/ActivityTable.tsx` (consumer), `src/components/NotesBox.tsx` (trigger)
+**Symptom:** Typing in the notes box lags.
+```typescript
+// AppContext.tsx - new value object every render
+<AppContext.Provider value={{ user, theme, draftNote, setDraftNote }}>
+  {children}
+</AppContext.Provider>
+
+// ActivityTable.tsx - memo'd row reads context
+const TableRow = memo(function TableRow({ row }) {
+  const { theme } = useAppContext();  // context change bypasses memo
+  const dateFmt = new Intl.DateTimeFormat(...);  // expensive per render
+  const costFmt = new Intl.NumberFormat(...);
+  // ...
+});
+```
+300 rows re-render on every keystroke. `memo` does not block context updates.
 
 ## 5. Fixed cost per MCP
 | Config | Tools exposed | Input tokens on a one-word prompt | Extra tokens vs no MCP |
