@@ -202,7 +202,8 @@ const TableRow = memo(function TableRow({ row }) {
   // ...
 });
 ```
-300 rows re-render on every keystroke. `memo` does not block context updates.
+1500 rows re-render on every keystroke. `memo` does not block context updates.
+Each row creates ~12 Intl formatters (5 locales x currency + date + relative time + collator + percent + 2 number). Bumped from 300 to 1500 rows because M4 handled 300 without visible lag.
 
 ## 5. Fixed cost per MCP
 | Config | Tools exposed | Input tokens on a one-word prompt | Extra tokens vs no MCP |

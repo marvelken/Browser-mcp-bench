@@ -11,6 +11,8 @@ interface ActivityRow {
   impact: number;
 }
 
+const LOCALES = ['en-US', 'de-DE', 'ja-JP', 'fr-FR', 'zh-CN'] as const;
+
 const TableRow = memo(function TableRow({ row }: { row: ActivityRow }) {
   const { theme } = useAppContext();
 
@@ -28,6 +30,29 @@ const TableRow = memo(function TableRow({ row }: { row: ActivityRow }) {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   });
+  const pctFmt = new Intl.NumberFormat('en-US', {
+    style: 'percent',
+    minimumFractionDigits: 2,
+  });
+
+  // Format cost in multiple locales for tooltip
+  const localizedCosts = LOCALES.map((locale) => {
+    const fmt = new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' });
+    return fmt.format(row.cost);
+  });
+  const tooltip = localizedCosts.join(' / ');
+
+  // Relative time for each row
+  const rtf = new Intl.RelativeTimeFormat('en-US', { numeric: 'auto' });
+  const hoursAgo = Math.floor((Date.now() - new Date(row.timestamp).getTime()) / 3600000);
+  const relTime = rtf.format(-hoursAgo, 'hour');
+
+  // Sort a small array with a locale-aware collator per render
+  const collator = new Intl.Collator('en-US', { sensitivity: 'base' });
+  const words = [row.project, row.person, row.action, relTime, tooltip];
+  const sorted = [...words].sort(collator.compare);
+  const _hash = sorted.join('');
+  void _hash;
 
   const bg = theme === 'dark' ? '#1a1a1a' : row.id % 2 === 0 ? '#f9f9f9' : '#fff';
 
@@ -37,9 +62,9 @@ const TableRow = memo(function TableRow({ row }: { row: ActivityRow }) {
       <td style={{ padding: '4px 8px' }}>{row.person}</td>
       <td style={{ padding: '4px 8px' }}>{row.action}</td>
       <td style={{ padding: '4px 8px' }}>{row.project}</td>
-      <td style={{ padding: '4px 8px' }}>{dateFmt.format(new Date(row.timestamp))}</td>
-      <td style={{ padding: '4px 8px' }}>{costFmt.format(row.cost)}</td>
-      <td style={{ padding: '4px 8px' }}>{impactFmt.format(row.impact)}</td>
+      <td style={{ padding: '4px 8px' }} title={relTime}>{dateFmt.format(new Date(row.timestamp))}</td>
+      <td style={{ padding: '4px 8px' }} title={tooltip}>{costFmt.format(row.cost)}</td>
+      <td style={{ padding: '4px 8px' }}>{impactFmt.format(row.impact)} ({pctFmt.format(row.impact / 10)})</td>
     </tr>
   );
 });

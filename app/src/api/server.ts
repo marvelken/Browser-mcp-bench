@@ -45,7 +45,7 @@ function generateActivity() {
   const actions = ['deployed', 'merged PR', 'opened issue', 'closed ticket', 'reviewed PR', 'updated docs'];
   const people = ['Bob', 'Carol', 'Dave', 'Eve', 'Frank', 'Grace', 'Hank', 'Irene'];
   const rows = [];
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 1500; i++) {
     rows.push({
       id: i + 1,
       person: people[i % people.length],
