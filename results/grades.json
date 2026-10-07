@@ -1,0 +1,252 @@
+{
+  "trackA-chrome-bug1-r0": {
+    "run_id": "trackA-chrome-bug1-r0",
+    "bug": "bug1",
+    "score": 2,
+    "matched_sentence": "The `CardRow.tsx` component fetches `/api/projects/{id}/stats` for all 8 projects sequentially (each request awaited before the next starts) rather than in parallel, turning 8 × 352ms server responses",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "The actual source code of `CardRow.tsx` or `ProjectCard.tsx` to confirm whether the sequential fetching is done via `await` in a loop, a state-driven re-render chain, or some other mechanism."
+  },
+  "trackA-chrome-bug1-r2": {
+    "error": "Could not parse transcript",
+    "score": null,
+    "needs_human_review": true
+  },
+  "trackA-chrome-bug2-r0": {
+    "run_id": "trackA-chrome-bug2-r0",
+    "bug": "bug2",
+    "score": 2,
+    "matched_sentence": "The card title `<div>` elements have an inline style `white-space: nowrap`, which prevents the long unbroken project name \"InfrastructureMonitoringDashboardForProductionServices\" from wrapping",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-chrome-bug2-r2": {
+    "run_id": "trackA-chrome-bug2-r2",
+    "bug": "bug2",
+    "score": 2,
+    "matched_sentence": "The card title element for \"InfrastructureMonitoringDashboardForProductionServices\" has an inline style `white-space: nowrap` that prevents the long, unbroken project name from wrapping, inflating tha",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-chrome-bug3-r0": {
+    "run_id": "trackA-chrome-bug3-r0",
+    "bug": "bug3",
+    "score": 2,
+    "matched_sentence": "The `/api/projects/5/stats` endpoint for the \"Data Pipeline\" project returns its stats nested inside a `data` wrapper (`{\"data\":{\"revenue\":68000,...}}`) instead of a flat object (`{\"revenue\":68000,...",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-chrome-bug3-r2": {
+    "error": "Could not parse transcript",
+    "score": null,
+    "needs_human_review": true
+  },
+  "trackA-chrome-bug4-r0": {
+    "run_id": "trackA-chrome-bug4-r0",
+    "bug": "bug4",
+    "score": 2,
+    "matched_sentence": "The `NotesBox` textarea's `onChange` updates `draftNote` state stored in `AppProvider`'s context, which causes the un-memoized `ActivityTable` component (1500 rows, 10,507 cells) to fully re-render on",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "Source code directly (worked via React fiber introspection). Performance trace crashed the page, so I couldn't get a flame chart breakdown, but JavaScript timing confirmed the render cost."
+  },
+  "trackA-chrome-bug4-r2": {
+    "error": "Could not parse transcript",
+    "score": null,
+    "needs_human_review": true
+  },
+  "trackA-firefox-bug1-r0": {
+    "run_id": "trackA-firefox-bug1-r0",
+    "bug": "bug1",
+    "score": 2,
+    "matched_sentence": "The `CardRow` component fetches `/api/projects/{id}/stats` for all 8 projects sequentially (using `await` inside a `for...of` loop) instead of in parallel, and only calls `setStatsMap` after all reque",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-firefox-bug2-r0": {
+    "run_id": "trackA-firefox-bug2-r0",
+    "bug": "bug2",
+    "score": 2,
+    "matched_sentence": "The project title divs have `white-space: nowrap` set as an inline style, which prevents the long unbreakable project name \"InfrastructureMonitoringDashboardForProductionServices\" (card index 2) from ",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-firefox-bug2-r1": {
+    "run_id": "trackA-firefox-bug2-r1",
+    "bug": "bug2",
+    "score": 2,
+    "matched_sentence": "The project card title `<div>` has an inline style `white-space: nowrap` which, combined with the long unbreakable project name \"InfrastructureMonitoringDashboardForProductionServices\" and the flex it",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-firefox-bug3-r0": {
+    "run_id": "trackA-firefox-bug3-r0",
+    "bug": "bug3",
+    "score": 2,
+    "matched_sentence": "The `/api/projects/5/stats` API endpoint (Data Pipeline) returns its stats nested inside a `data` wrapper (`{\"data\":{...}}`), while all other project stats endpoints return a flat object (`{\"revenue\":",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-firefox-bug3-r1": {
+    "run_id": "trackA-firefox-bug3-r1",
+    "bug": "bug3",
+    "score": 2,
+    "matched_sentence": "`{\"data\":{\"revenue\":68000,...}}`), while all other project stats endpoints return the stats fields at the top level (e.g",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-firefox-bug4-r0": {
+    "run_id": "trackA-firefox-bug4-r0",
+    "bug": "bug4",
+    "score": 2,
+    "matched_sentence": "The `TableRow` component in `ActivityTable.tsx` consumes `AppContext` (to read `theme`), so every keystroke in the `NotesBox` (which updates `draftNote` in the same context) forces all 1,500 memoized ",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-firefox-bug4-r2": {
+    "error": "Could not parse transcript",
+    "score": null,
+    "needs_human_review": true
+  },
+  "trackA-safari-bug1-r0": {
+    "run_id": "trackA-safari-bug1-r0",
+    "bug": "bug1",
+    "score": 2,
+    "matched_sentence": "The `StatDisplay` / `ProjectCard` components fetch `/api/projects/{id}/stats` sequentially (each request waits ~350ms for the previous one to complete before starting), creating a waterfall of 8 seria",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "The actual source code of `StatDisplay.tsx`, `ProjectCard.tsx`, and `AppContext.tsx` to confirm whether the sequential fetching is caused by an `await` in a loop, a serial `reduce`/chain pattern, or React re-render cascading — but the network evidence conclusively shows the sequential behavior."
+  },
+  "trackA-safari-bug1-r1": {
+    "run_id": "trackA-safari-bug1-r1",
+    "bug": "bug1",
+    "score": 2,
+    "matched_sentence": "The `CardRow` component (`CardRow.tsx`) fetches stats for all 8 projects sequentially using `await` inside a `for...of` loop, and each `/api/projects/{id}/stats` endpoint has ~350ms server-side latenc",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-safari-bug2-r0": {
+    "run_id": "trackA-safari-bug2-r0",
+    "bug": "bug2",
+    "score": 2,
+    "matched_sentence": "The project card title element has `white-space: nowrap` and the flex item has the default `min-width: auto`, so the long unbroken title string \"InfrastructureMonitoringDashboardForProductionServices\"",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-safari-bug3-r0": {
+    "run_id": "trackA-safari-bug3-r0",
+    "bug": "bug3",
+    "score": 2,
+    "matched_sentence": "The Data Pipeline project (id 5, owner Frank) is passed a `stats` prop with shape `{ data: { revenue, users, growth, tickets } }` instead of `{ revenue, users, growth, tickets }`",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackA-safari-bug3-r2": {
+    "error": "Could not parse transcript",
+    "score": null,
+    "needs_human_review": true
+  },
+  "trackA-safari-bug4-r0": {
+    "error": "Could not parse transcript",
+    "score": null,
+    "needs_human_review": true
+  },
+  "trackB-chrome-layerA-r0": {
+    "run_id": "trackB-chrome-layerA-r0",
+    "bug": "bug4",
+    "score": 2,
+    "matched_sentence": "Every `Memo(TableRow)` component (1,500 of them) calls `useContext(AppContext)`, which includes `draftNote`",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackB-chrome-layerB-r0.contaminated": {
+    "run_id": "trackB-chrome-layerB-r0.contaminated",
+    "bug": "bug4",
+    "score": 2,
+    "matched_sentence": "The `TableRow` component (1500 instances, not memoized) calls `useAppContext()` to read `theme`, subscribing it to the same React Context that holds `draftNote` state",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackB-chrome-layerB-r0": {
+    "error": "Could not parse transcript",
+    "score": null,
+    "needs_human_review": true
+  },
+  "trackB-firefox-layerB-r0": {
+    "run_id": "trackB-firefox-layerB-r0",
+    "bug": "bug4",
+    "score": 2,
+    "matched_sentence": "The `TableRow` component in `ActivityTable.tsx` consumes `AppContext` (to read `theme`), which also contains `draftNote`",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackB-firefox-layerB-r2": {
+    "run_id": "trackB-firefox-layerB-r2",
+    "bug": "bug4",
+    "score": 2,
+    "matched_sentence": "The `TableRow` component in `ActivityTable.tsx` calls `useAppContext()` to read `theme`, but the same context also holds `draftNote`",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  },
+  "trackB-safari-layerB-r0.contaminated": {
+    "run_id": "trackB-safari-layerB-r0.contaminated",
+    "bug": "bug4",
+    "score": 2,
+    "matched_sentence": "Each of the 1,500 `TableRow` components subscribes to the app context (via `useAppContext()`) which includes `draftNote`",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "React DevTools profiler flamegraph (agent-react-devtools CLI was not available); could not directly measure per-row render time or confirm exact re-render count via profiling."
+  },
+  "trackB-safari-layerB-r0": {
+    "error": "Could not parse transcript",
+    "score": null,
+    "needs_human_review": true
+  },
+  "trackB-safari-layerB-r1.contaminated": {
+    "run_id": "trackB-safari-layerB-r1.contaminated",
+    "bug": "bug4",
+    "score": 2,
+    "matched_sentence": "The `NotesBox` textarea's `draftNote` state lives in `AppProvider`'s context, so every keystroke re-renders all 1500 un-memoized `TableRow` components that consume that context (each creating ~10 expe",
+    "reasoning": "Both facts present. A: matched keywords in answer. B: matched keywords in answer.",
+    "needs_human_review": false,
+    "confidence": "high",
+    "could_not_see": "nothing"
+  }
+}

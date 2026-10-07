@@ -315,8 +315,7 @@ async function runOne(run) {
     // Wall clock timeout
     const timer = setTimeout(() => {
       console.log(`  TIMEOUT: ${run.id} hit ${WALL_CLOCK_MINUTES}m wall clock`);
-      proc.kill('SIGTERM');
-      setTimeout(() => { try { proc.kill('SIGKILL'); } catch {} }, 5000);
+      proc.kill('SIGKILL');
     }, WALL_CLOCK_MINUTES * 60 * 1000);
 
     proc.on('close', (code) => {

@@ -1,0 +1,1362 @@
+{
+  "trackA-chrome-bug1-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 122.924,
+    "num_turns": 19,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 194133,
+    "output_tokens": 4827,
+    "cache_creation_tokens": 20782,
+    "cache_read_tokens": 173339,
+    "total_tokens": 198960,
+    "cost_usd": 0.337292,
+    "tool_calls": [
+      "mcp__chrome__new_page",
+      "mcp__chrome__emulate",
+      "mcp__chrome__take_snapshot",
+      "mcp__chrome__take_screenshot",
+      "mcp__chrome__list_network_requests",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__performance_start_trace",
+      "mcp__chrome__performance_analyze_insight",
+      "mcp__chrome__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__chrome__new_page": 1,
+      "mcp__chrome__emulate": 1,
+      "mcp__chrome__take_snapshot": 1,
+      "mcp__chrome__take_screenshot": 1,
+      "mcp__chrome__list_network_requests": 1,
+      "mcp__chrome__get_network_request": 10,
+      "mcp__chrome__performance_start_trace": 1,
+      "mcp__chrome__performance_analyze_insight": 1,
+      "mcp__chrome__evaluate_script": 1
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `CardRow.tsx` component fetches `/api/projects/{id}/stats` for all 8 projects sequentially (each request awaited before the next starts) rather than in parallel, turning 8 × 352ms server responses into a ~2.8s waterfall instead of a single ~352ms parallel batch.",
+      "evidence": "Performance Resource Timing API showed each stats request starts within 0–1ms of the previous one ending (e.g., project/1/stats ends at 1046ms, project/2/stats starts at 1047ms), confirmed by the NetworkDependencyTree performance insight which showed the critical path through `/api/projects/8/stats` at 3,512ms. All 8 stats requests are children of `CardRow.tsx` in the dependency tree.",
+      "confidence": "high",
+      "could_not_see": "The actual source code of `CardRow.tsx` or `ProjectCard.tsx` to confirm whether the sequential fetching is done via `await` in a loop, a state-driven re-render chain, or some other mechanism."
+    }
+  },
+  "trackA-chrome-bug1-r2": {
+    "error": "Could not parse transcript"
+  },
+  "trackA-chrome-bug2-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 108.807,
+    "num_turns": 14,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 237308,
+    "output_tokens": 4234,
+    "cache_creation_tokens": 13602,
+    "cache_read_tokens": 223690,
+    "total_tokens": 241542,
+    "cost_usd": 0.3027875,
+    "tool_calls": [
+      "mcp__chrome__new_page",
+      "mcp__chrome__resize_page",
+      "mcp__chrome__take_screenshot",
+      "mcp__chrome__take_snapshot",
+      "mcp__chrome__take_snapshot",
+      "Read",
+      "Bash",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__chrome__new_page": 1,
+      "mcp__chrome__resize_page": 1,
+      "mcp__chrome__take_screenshot": 1,
+      "mcp__chrome__take_snapshot": 2,
+      "Read": 1,
+      "Bash": 1,
+      "mcp__chrome__evaluate_script": 6
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01XNTgfurAgzfVNFMuunrcjh",
+        "error": "<tool_use_error>Error: No such tool available: Read</tool_use_error>"
+      },
+      {
+        "tool_use_id": "toolu_01Bg6qp12GN2JHmQNG5EdhPg",
+        "error": "<tool_use_error>Error: No such tool available: Bash</tool_use_error>"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The card title `<div>` elements have an inline style `white-space: nowrap`, which prevents the long unbroken project name \"InfrastructureMonitoringDashboardForProductionServices\" from wrapping. Combined with the default `min-width: auto` on flex items, this forces that card to ~478px wide, pushing the total row (1546px) past the container width (1168px).",
+      "evidence": "`evaluate_script` revealed the title inline style is `white-space: nowrap; font-weight: 600; font-size: 1rem;`, the card's min-width is `auto`, the container's flex-wrap is `nowrap`, and `scrollWidth` (1546) exceeds `clientWidth` (1168) by 378px. The screenshot confirmed the rightmost cards are clipped.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-chrome-bug2-r2": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 98.563,
+    "num_turns": 9,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 150004,
+    "output_tokens": 4290,
+    "cache_creation_tokens": 13454,
+    "cache_read_tokens": 136539,
+    "total_tokens": 154294,
+    "cost_usd": 0.259662,
+    "tool_calls": [
+      "mcp__chrome__new_page",
+      "mcp__chrome__resize_page",
+      "mcp__chrome__take_screenshot",
+      "mcp__chrome__take_snapshot",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__chrome__new_page": 1,
+      "mcp__chrome__resize_page": 1,
+      "mcp__chrome__take_screenshot": 1,
+      "mcp__chrome__take_snapshot": 1,
+      "mcp__chrome__evaluate_script": 4
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The card title element for \"InfrastructureMonitoringDashboardForProductionServices\" has an inline style `white-space: nowrap` that prevents the long, unbroken project name from wrapping, inflating that card's intrinsic minimum width to ~478px. Combined with the cards' flex container having no `flex-wrap` and the cards having the default `min-width: auto`, the row overflows past the viewport.",
+      "evidence": "`evaluate_script` showed the title `<div>` has inline `style=\"white-space: nowrap; font-weight: 600; font-size: 1rem;\"`, the flex container has inline `style=\"display: flex; gap: 1rem;\"` (no flex-wrap), and the container's scrollWidth (1546px) exceeds its clientWidth (1168px), confirmed by the screenshot showing the last card cut off at the right edge.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-chrome-bug3-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 68.444,
+    "num_turns": 14,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 177696,
+    "output_tokens": 2249,
+    "cache_creation_tokens": 12054,
+    "cache_read_tokens": 165629,
+    "total_tokens": 179945,
+    "cost_usd": 0.21444200000000002,
+    "tool_calls": [
+      "mcp__chrome__new_page",
+      "mcp__chrome__resize_page",
+      "mcp__chrome__take_snapshot",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__list_console_messages",
+      "mcp__chrome__list_network_requests",
+      "mcp__chrome__get_console_message",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request",
+      "mcp__chrome__get_network_request"
+    ],
+    "tool_counts": {
+      "mcp__chrome__new_page": 1,
+      "mcp__chrome__resize_page": 1,
+      "mcp__chrome__take_snapshot": 1,
+      "mcp__chrome__evaluate_script": 2,
+      "mcp__chrome__list_console_messages": 1,
+      "mcp__chrome__list_network_requests": 1,
+      "mcp__chrome__get_console_message": 1,
+      "mcp__chrome__get_network_request": 5
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `/api/projects/5/stats` endpoint for the \"Data Pipeline\" project returns its stats nested inside a `data` wrapper (`{\"data\":{\"revenue\":68000,...}}`) instead of a flat object (`{\"revenue\":68000,...}`) like all other projects. The `StatDisplay` component in `ProjectCard.tsx` (line 39) accesses properties like `stats.revenue` directly, which are `undefined` due to the extra nesting, causing a `TypeError: Cannot read properties of undefined (reading 'toLocaleString')` that is caught by an ErrorBoundary and displays \"Something went wrong\".",
+      "evidence": "Network request reqid=29 (`GET /api/projects/5/stats`) returned `{\"data\":{\"revenue\":68000,\"users\":1850,\"growth\":4.2,\"tickets\":22}}` while all other project stats endpoints (e.g., reqid=25 for project 1) returned flat JSON like `{\"revenue\":51234,\"users\":1634,\"growth\":5.9,\"tickets\":29}`. Console error msgid=5 confirmed the crash: `TypeError: Cannot read properties of undefined (reading 'toLocaleString')` in `<StatDisplay>` at `ProjectCard.tsx:39`.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-chrome-bug3-r2": {
+    "error": "Could not parse transcript"
+  },
+  "trackA-chrome-bug4-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 397.784,
+    "num_turns": 26,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 492583,
+    "output_tokens": 8110,
+    "cache_creation_tokens": 16801,
+    "cache_read_tokens": 475754,
+    "total_tokens": 500693,
+    "cost_usd": 0.54577325,
+    "tool_calls": [
+      "mcp__chrome__new_page",
+      "mcp__chrome__emulate",
+      "mcp__chrome__take_snapshot",
+      "mcp__chrome__take_screenshot",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__performance_start_trace",
+      "mcp__chrome__type_text",
+      "mcp__chrome__performance_stop_trace",
+      "mcp__chrome__list_pages",
+      "mcp__chrome__new_page",
+      "mcp__chrome__emulate",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__chrome__new_page": 2,
+      "mcp__chrome__emulate": 2,
+      "mcp__chrome__take_snapshot": 1,
+      "mcp__chrome__take_screenshot": 1,
+      "mcp__chrome__evaluate_script": 15,
+      "mcp__chrome__performance_start_trace": 1,
+      "mcp__chrome__type_text": 1,
+      "mcp__chrome__performance_stop_trace": 1,
+      "mcp__chrome__list_pages": 1
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01PaCR98jATAZJRXjMMbjk92",
+        "error": "MCP error -32000: Connection closed"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `NotesBox` textarea's `onChange` updates `draftNote` state stored in `AppProvider`'s context, which causes the un-memoized `ActivityTable` component (1500 rows, 10,507 cells) to fully re-render on every keystroke.",
+      "evidence": "`AppProvider` context contains `{user, theme, draftNote, setDraftNote}` and wraps both `NotesBox` and `ActivityTable` at the same level. `ActivityTable` is not wrapped in `React.memo` (confirmed via fiber inspection). Each synthetic keystroke takes 200-350ms (measured via `performance.now()` around dispatching input events). The table has 1,501 rows and 10,507 cells (confirmed via DOM query). All confirmed via `evaluate_script`.",
+      "confidence": "high",
+      "could_not_see": "Source code directly (worked via React fiber introspection). Performance trace crashed the page, so I couldn't get a flame chart breakdown, but JavaScript timing confirmed the render cost."
+    }
+  },
+  "trackA-chrome-bug4-r2": {
+    "error": "Could not parse transcript"
+  },
+  "trackA-firefox-bug1-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 58.685,
+    "num_turns": 11,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 174134,
+    "output_tokens": 2108,
+    "cache_creation_tokens": 36720,
+    "cache_read_tokens": 137406,
+    "total_tokens": 176242,
+    "cost_usd": 0.350943,
+    "tool_calls": [
+      "mcp__firefox__set_viewport_size",
+      "mcp__firefox__navigate_page",
+      "mcp__firefox__take_snapshot",
+      "mcp__firefox__list_network_requests",
+      "mcp__firefox__list_console_messages",
+      "mcp__firefox__enable_debugger",
+      "mcp__firefox__list_scripts",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source"
+    ],
+    "tool_counts": {
+      "mcp__firefox__set_viewport_size": 1,
+      "mcp__firefox__navigate_page": 1,
+      "mcp__firefox__take_snapshot": 1,
+      "mcp__firefox__list_network_requests": 1,
+      "mcp__firefox__list_console_messages": 1,
+      "mcp__firefox__enable_debugger": 1,
+      "mcp__firefox__list_scripts": 1,
+      "mcp__firefox__get_script_source": 3
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `CardRow` component fetches `/api/projects/{id}/stats` for all 8 projects sequentially (using `await` inside a `for...of` loop) instead of in parallel, and only calls `setStatsMap` after all requests complete, causing a ~2.8s waterfall delay before any stats appear.",
+      "evidence": "Network request timings from `list_network_requests` show each stats request starts only after the previous one finishes (each ~350ms, total ~2.8s). The source code in `CardRow.tsx` confirms the sequential `for (const p of projData) { const statsRes = await fetch(...) }` pattern with a single `setStatsMap(map)` call after the loop.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-firefox-bug2-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 54.62,
+    "num_turns": 8,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 101978,
+    "output_tokens": 2194,
+    "cache_creation_tokens": 12614,
+    "cache_read_tokens": 89356,
+    "total_tokens": 104172,
+    "cost_usd": 0.1784055,
+    "tool_calls": [
+      "mcp__firefox__set_viewport_size",
+      "mcp__firefox__navigate_page",
+      "mcp__firefox__screenshot_page",
+      "mcp__firefox__take_snapshot",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__firefox__set_viewport_size": 1,
+      "mcp__firefox__navigate_page": 1,
+      "mcp__firefox__screenshot_page": 1,
+      "mcp__firefox__take_snapshot": 1,
+      "mcp__firefox__evaluate_script": 3
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The project title divs have `white-space: nowrap` set as an inline style, which prevents the long unbreakable project name \"InfrastructureMonitoringDashboardForProductionServices\" (card index 2) from wrapping. Combined with the flex items' default `min-width: auto`, this forces the card to 478px wide and pushes the total row width (1547px) past the container's 1168px, causing overflow.",
+      "evidence": "`evaluate_script` showed each card title has `white-space: nowrap`, card 2 is 478px wide vs ~120-177px for others, and the container's `scrollWidth` (1547) exceeds its `clientWidth` (1168). The screenshot confirms the last cards are cut off at the right edge.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-firefox-bug2-r1": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 101.155,
+    "num_turns": 16,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 262424,
+    "output_tokens": 4075,
+    "cache_creation_tokens": 16150,
+    "cache_read_tokens": 246258,
+    "total_tokens": 266499,
+    "cost_usd": 0.3260215,
+    "tool_calls": [
+      "mcp__firefox__set_viewport_size",
+      "mcp__firefox__navigate_page",
+      "mcp__firefox__screenshot_page",
+      "mcp__firefox__take_snapshot",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__firefox__set_viewport_size": 1,
+      "mcp__firefox__navigate_page": 1,
+      "mcp__firefox__screenshot_page": 1,
+      "mcp__firefox__take_snapshot": 1,
+      "mcp__firefox__evaluate_script": 11
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The project card title `<div>` has an inline style `white-space: nowrap` which, combined with the long unbreakable project name \"InfrastructureMonitoringDashboardForProductionServices\" and the flex item's default `min-width: auto`, prevents the card from shrinking below its content width (~478px), causing the `display: flex` cards container (which also lacks `flex-wrap: wrap`) to overflow the page.",
+      "evidence": "`evaluate_script` showed the title element has inline style `white-space: nowrap; font-weight: 600; font-size: 1rem;`, the card has `min-width: auto`, and the flex container's scrollWidth (1547px) exceeds its clientWidth (1168px). The screenshot confirmed the \"Analytics\" card is cut off at the right edge.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-firefox-bug3-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 90.877,
+    "num_turns": 21,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 265540,
+    "output_tokens": 3516,
+    "cache_creation_tokens": 19270,
+    "cache_read_tokens": 246255,
+    "total_tokens": 269056,
+    "cost_usd": 0.33154,
+    "tool_calls": [
+      "mcp__firefox__set_viewport_size",
+      "mcp__firefox__navigate_page",
+      "mcp__firefox__take_snapshot",
+      "mcp__firefox__screenshot_page",
+      "mcp__firefox__list_console_messages",
+      "mcp__firefox__list_console_messages",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__list_network_requests",
+      "mcp__firefox__get_network_request",
+      "mcp__firefox__get_network_request",
+      "mcp__firefox__get_network_request",
+      "mcp__firefox__get_network_request",
+      "mcp__firefox__get_network_request",
+      "mcp__firefox__get_network_request"
+    ],
+    "tool_counts": {
+      "mcp__firefox__set_viewport_size": 1,
+      "mcp__firefox__navigate_page": 1,
+      "mcp__firefox__take_snapshot": 1,
+      "mcp__firefox__screenshot_page": 1,
+      "mcp__firefox__list_console_messages": 2,
+      "mcp__firefox__evaluate_script": 7,
+      "mcp__firefox__list_network_requests": 1,
+      "mcp__firefox__get_network_request": 6
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01LmB4gEUD8A7G97nwFwNDh6",
+        "error": "Error: Cannot read properties of undefined (reading 'map')"
+      },
+      {
+        "tool_use_id": "toolu_01FQhB1VBL2d11sxDQodPiMe",
+        "error": "Error: Cannot read properties of undefined (reading 'map')"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `/api/projects/5/stats` API endpoint (Data Pipeline) returns its stats nested inside a `data` wrapper (`{\"data\":{...}}`), while all other project stats endpoints return a flat object (`{\"revenue\":...}`). The `<StatDisplay>` component accesses `stats.revenue` directly without unwrapping the `data` property, so `stats.revenue` is `undefined` and calling `.toLocaleString()` on it throws a TypeError, which the `ErrorBoundary` catches and renders as \"Something went wrong\".",
+      "evidence": "`get_network_request` showed `/api/projects/5/stats` returns `{\"data\":{\"revenue\":68000,\"users\":1850,\"growth\":4.2,\"tickets\":22}}` while all other endpoints (1-4, 6) return flat objects like `{\"revenue\":51234,...}`. `list_console_messages` with `level=error` showed `TypeError: can't access property \"toLocaleString\", stats.revenue is undefined` in the `<StatDisplay>` component, caught by `ErrorBoundary`.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-firefox-bug3-r1": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 42.393,
+    "num_turns": 10,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 95428,
+    "output_tokens": 1352,
+    "cache_creation_tokens": 23083,
+    "cache_read_tokens": 72338,
+    "total_tokens": 96780,
+    "cost_usd": 0.21427274999999998,
+    "tool_calls": [
+      "mcp__firefox__set_viewport_size",
+      "mcp__firefox__navigate_page",
+      "mcp__firefox__take_snapshot",
+      "mcp__firefox__list_console_messages",
+      "mcp__firefox__list_network_requests",
+      "mcp__firefox__screenshot_page",
+      "mcp__firefox__get_network_request",
+      "mcp__firefox__list_console_messages",
+      "mcp__firefox__get_network_request"
+    ],
+    "tool_counts": {
+      "mcp__firefox__set_viewport_size": 1,
+      "mcp__firefox__navigate_page": 1,
+      "mcp__firefox__take_snapshot": 1,
+      "mcp__firefox__list_console_messages": 2,
+      "mcp__firefox__list_network_requests": 1,
+      "mcp__firefox__screenshot_page": 1,
+      "mcp__firefox__get_network_request": 2
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `/api/projects/5/stats` endpoint returns the stats object wrapped in an extra `{\"data\": {...}}` envelope (e.g. `{\"data\":{\"revenue\":68000,...}}`), while all other project stats endpoints return the stats fields at the top level (e.g. `{\"revenue\":51234,...}`). The `StatDisplay` component accesses `stats.revenue` directly, which is `undefined` for project 5 due to the extra nesting, causing a `TypeError` on `.toLocaleString()` that the `ErrorBoundary` catches.",
+      "evidence": "`get_network_request` showed project 1 returns `{\"revenue\":51234,...}` while project 5 returns `{\"data\":{\"revenue\":68000,...}}`; `list_console_messages` (level=error) showed `TypeError: can't access property \"toLocaleString\", stats.revenue is undefined` in the `<StatDisplay>` component.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-firefox-bug4-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 75.525,
+    "num_turns": 13,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 222867,
+    "output_tokens": 2228,
+    "cache_creation_tokens": 30770,
+    "cache_read_tokens": 192086,
+    "total_tokens": 225095,
+    "cost_usd": 0.3441105,
+    "tool_calls": [
+      "mcp__firefox__set_viewport_size",
+      "mcp__firefox__navigate_page",
+      "mcp__firefox__take_snapshot",
+      "mcp__firefox__enable_debugger",
+      "mcp__firefox__screenshot_page",
+      "mcp__firefox__list_scripts",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__get_script_source"
+    ],
+    "tool_counts": {
+      "mcp__firefox__set_viewport_size": 1,
+      "mcp__firefox__navigate_page": 1,
+      "mcp__firefox__take_snapshot": 1,
+      "mcp__firefox__enable_debugger": 1,
+      "mcp__firefox__screenshot_page": 1,
+      "mcp__firefox__list_scripts": 1,
+      "mcp__firefox__get_script_source": 4,
+      "mcp__firefox__evaluate_script": 2
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `TableRow` component in `ActivityTable.tsx` consumes `AppContext` (to read `theme`), so every keystroke in the `NotesBox` (which updates `draftNote` in the same context) forces all 1,500 memoized `TableRow` components to re-render, each re-creating ~11 expensive `Intl` formatter objects (DateTimeFormat, NumberFormat, RelativeTimeFormat, Collator) on every render.",
+      "evidence": "`get_script_source` showed `TableRow` calls `useAppContext()` and creates multiple `Intl.*` instances per render; `evaluate_script` measured 16,500 `Intl` constructor calls and ~228ms elapsed per keystroke across 1,500 table rows.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-firefox-bug4-r2": {
+    "error": "Could not parse transcript"
+  },
+  "trackA-safari-bug1-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 94.14,
+    "num_turns": 16,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 148376,
+    "output_tokens": 2261,
+    "cache_creation_tokens": 16975,
+    "cache_read_tokens": 131386,
+    "total_tokens": 150637,
+    "cost_usd": 0.22838675000000003,
+    "tool_calls": [
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__navigate_to_url",
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__get_page_content",
+      "Read",
+      "mcp__safari__get_page_content",
+      "mcp__safari__get_page_content",
+      "mcp__safari__list_network_requests",
+      "mcp__safari__navigate_to_url",
+      "mcp__safari__wait_for_navigation",
+      "mcp__safari__list_network_requests",
+      "mcp__safari__get_network_request",
+      "mcp__safari__get_network_request",
+      "mcp__safari__get_network_request",
+      "mcp__safari__get_network_request"
+    ],
+    "tool_counts": {
+      "mcp__safari__set_viewport_size": 2,
+      "mcp__safari__navigate_to_url": 2,
+      "mcp__safari__get_page_content": 3,
+      "Read": 1,
+      "mcp__safari__list_network_requests": 2,
+      "mcp__safari__wait_for_navigation": 1,
+      "mcp__safari__get_network_request": 4
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01R9VL9AD89e5P4FgG1JTDj7",
+        "error": "Tool error: Command failed: No active tab"
+      },
+      {
+        "tool_use_id": "toolu_01F2QPhq9uvppBCG2AVimJnX",
+        "error": "<tool_use_error>Error: No such tool available: Read</tool_use_error>"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `StatDisplay` / `ProjectCard` components fetch `/api/projects/{id}/stats` sequentially (each request waits ~350ms for the previous one to complete before starting), creating a waterfall of 8 serial requests that takes ~2.8 seconds instead of ~350ms if they were fetched in parallel.",
+      "evidence": "Network request timestamps from `list_network_requests` show each `/api/projects/N/stats` request starts exactly ~355ms after the previous one (matching the ~352ms TTFB), confirming serial execution: project 1 stats at 29.068s, project 2 at 29.423s, ..., project 8 at 31.562s.",
+      "confidence": "high",
+      "could_not_see": "The actual source code of `StatDisplay.tsx`, `ProjectCard.tsx`, and `AppContext.tsx` to confirm whether the sequential fetching is caused by an `await` in a loop, a serial `reduce`/chain pattern, or React re-render cascading — but the network evidence conclusively shows the sequential behavior."
+    }
+  },
+  "trackA-safari-bug1-r1": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 122.185,
+    "num_turns": 19,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 247544,
+    "output_tokens": 3219,
+    "cache_creation_tokens": 26790,
+    "cache_read_tokens": 220735,
+    "total_tokens": 250763,
+    "cost_usd": 0.358375,
+    "tool_calls": [
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__navigate_to_url",
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__get_page_content",
+      "mcp__safari__list_network_requests",
+      "Read",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__list_network_requests",
+      "mcp__safari__navigate_to_url",
+      "mcp__safari__list_network_requests",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__list_network_requests",
+      "mcp__safari__get_network_request",
+      "mcp__safari__get_network_request",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript"
+    ],
+    "tool_counts": {
+      "mcp__safari__set_viewport_size": 2,
+      "mcp__safari__navigate_to_url": 2,
+      "mcp__safari__get_page_content": 1,
+      "mcp__safari__list_network_requests": 4,
+      "Read": 1,
+      "mcp__safari__evaluate_javascript": 6,
+      "mcp__safari__get_network_request": 2
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01CdCmFma5THf3htrzhLZqz2",
+        "error": "Tool error: Command failed: No active tab"
+      },
+      {
+        "tool_use_id": "toolu_017pesiC19cKgAg2RaWU7ui8",
+        "error": "<tool_use_error>Error: No such tool available: Read</tool_use_error>"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `CardRow` component (`CardRow.tsx`) fetches stats for all 8 projects sequentially using `await` inside a `for...of` loop, and each `/api/projects/{id}/stats` endpoint has ~350ms server-side latency. The stats are not rendered until all 8 sequential requests complete (~2.8s total), because `setStatsMap` is called only after the loop finishes.",
+      "evidence": "Network request timestamps from `list_network_requests` show `/api/projects/1/stats` through `/api/projects/8/stats` fired one after another with ~350ms gaps (05.462s → 07.965s). The source of `CardRow.tsx` (fetched via `evaluate_javascript`) confirms `await fetch(...)` inside a `for...of` loop with a single `setStatsMap(map)` call after the loop.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-safari-bug2-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 86.137,
+    "num_turns": 15,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 199555,
+    "output_tokens": 3744,
+    "cache_creation_tokens": 20095,
+    "cache_read_tokens": 179443,
+    "total_tokens": 203299,
+    "cost_usd": 0.30900025000000003,
+    "tool_calls": [
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__navigate_to_url",
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__get_page_content",
+      "Read",
+      "mcp__safari__screenshot",
+      "mcp__safari__screenshot",
+      "mcp__safari__get_page_content",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript"
+    ],
+    "tool_counts": {
+      "mcp__safari__set_viewport_size": 2,
+      "mcp__safari__navigate_to_url": 1,
+      "mcp__safari__get_page_content": 2,
+      "Read": 1,
+      "mcp__safari__screenshot": 2,
+      "mcp__safari__evaluate_javascript": 6
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01QiJaBhCMfhfcPNHCG9aHzu",
+        "error": "Tool error: Command failed: No active tab"
+      },
+      {
+        "tool_use_id": "toolu_01Ph3r9VPqtfhX4DCJ9xDxui",
+        "error": "<tool_use_error>Error: No such tool available: Read</tool_use_error>"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The project card title element has `white-space: nowrap` and the flex item has the default `min-width: auto`, so the long unbroken title string \"InfrastructureMonitoringDashboardForProductionServices\" (card index 2) prevents the flex item from shrinking, forcing the row of 8 `flex-wrap: nowrap` cards to overflow the viewport by ~378px.",
+      "evidence": "`evaluate_javascript` showed the flex container has `flex-wrap: nowrap`, the title div has `white-space: nowrap`, and card 2's title \"InfrastructureMonitoringDashboardForProductionServices\" renders at 444px wide (vs ~70-143px for other titles), making that card 478px and causing the last 3 cards (indices 5-7) to extend past the 1280px viewport (rightmost card reaching x=1602).",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-safari-bug3-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 81.78,
+    "num_turns": 17,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 241022,
+    "output_tokens": 2801,
+    "cache_creation_tokens": 20183,
+    "cache_read_tokens": 220820,
+    "total_tokens": 243823,
+    "cost_usd": 0.30667374999999997,
+    "tool_calls": [
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__navigate_to_url",
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__get_page_content",
+      "Read",
+      "Bash",
+      "mcp__safari__get_page_content",
+      "mcp__safari__browser_console_messages",
+      "mcp__safari__list_network_requests",
+      "mcp__safari__list_network_requests",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript"
+    ],
+    "tool_counts": {
+      "mcp__safari__set_viewport_size": 2,
+      "mcp__safari__navigate_to_url": 1,
+      "mcp__safari__get_page_content": 2,
+      "Read": 1,
+      "Bash": 1,
+      "mcp__safari__browser_console_messages": 1,
+      "mcp__safari__list_network_requests": 2,
+      "mcp__safari__evaluate_javascript": 6
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01Qw1ZGSSAibvWtpQ6YKg4r6",
+        "error": "Tool error: Command failed: No active tab"
+      },
+      {
+        "tool_use_id": "toolu_01DFAd6qbLw8YpPiHG5Gmvi9",
+        "error": "<tool_use_error>Error: No such tool available: Read</tool_use_error>"
+      },
+      {
+        "tool_use_id": "toolu_01SzA1r9xX1BxRLYtjAX848L",
+        "error": "<tool_use_error>Error: No such tool available: Bash</tool_use_error>"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The Data Pipeline project (id 5, owner Frank) is passed a `stats` prop with shape `{ data: { revenue, users, growth, tickets } }` instead of `{ revenue, users, growth, tickets }`. The `StatDisplay` component crashes with `TypeError: undefined is not an object (evaluating 'stats.revenue.toLocaleString')` because `stats.revenue` is undefined due to the extra `data` nesting, and the `ErrorBoundary` renders \"Something went wrong\".",
+      "evidence": "React fiber inspection via `evaluate_javascript` showed all other ProjectCards receive `stats: { revenue, users, ... }` but Data Pipeline receives `stats: { data: { revenue: 68000, ... } }`. Console errors (via `browser_console_messages`) confirmed `TypeError: undefined is not an object (evaluating 'stats.revenue.toLocaleString')` in the `<StatDisplay>` component, caught by `ErrorBoundary` at `src/components/ErrorBoundary.tsx:10`.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackA-safari-bug3-r2": {
+    "error": "Could not parse transcript"
+  },
+  "trackA-safari-bug4-r0": {
+    "error": "Could not parse transcript"
+  },
+  "trackB-chrome-layerA-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 144.107,
+    "num_turns": 28,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 489201,
+    "output_tokens": 4317,
+    "cache_creation_tokens": 28308,
+    "cache_read_tokens": 460869,
+    "total_tokens": 493518,
+    "cost_usd": 0.5154045,
+    "tool_calls": [
+      "mcp__chrome__new_page",
+      "mcp__chrome__emulate",
+      "mcp__chrome__take_snapshot",
+      "mcp__chrome__take_screenshot",
+      "mcp__chrome__list_3p_developer_tools",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__take_snapshot",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__type_text",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool",
+      "mcp__chrome__execute_3p_developer_tool"
+    ],
+    "tool_counts": {
+      "mcp__chrome__new_page": 1,
+      "mcp__chrome__emulate": 1,
+      "mcp__chrome__take_snapshot": 2,
+      "mcp__chrome__take_screenshot": 1,
+      "mcp__chrome__list_3p_developer_tools": 1,
+      "mcp__chrome__execute_3p_developer_tool": 16,
+      "mcp__chrome__evaluate_script": 4,
+      "mcp__chrome__type_text": 1
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_012TBghGH3kNZuP9xcuJiLNo",
+        "error": "Error: require is not defined"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "Every `Memo(TableRow)` component (1,500 of them) calls `useContext(AppContext)`, which includes `draftNote`. When typing in the `NotesBox`, `setDraftNote` updates state in `AppProvider`, creating a new context value that forces all 1,500 `TableRow` context consumers to re-render (~13,606 components, ~180–330 ms per keystroke), bypassing `React.memo`.",
+      "evidence": "React profiler (`react_get_trace_overview` with trace \"notes-typing\") showed each keystroke triggered a commit re-rendering 13,606 components with ~180–330 ms renderDuration. `react_get_component_by_uid` for `Memo(TableRow)` (uid r195) confirmed it consumes `AppContext` which contains `draftNote`, and the table has 1,500 rows (verified via `evaluate_script` counting `tbody tr` elements).",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackB-chrome-layerB-r0.contaminated": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 222.696,
+    "num_turns": 30,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 730745,
+    "output_tokens": 7211,
+    "cache_creation_tokens": 15964,
+    "cache_read_tokens": 714749,
+    "total_tokens": 737956,
+    "cost_usd": 0.6375845,
+    "tool_calls": [
+      "mcp__chrome__new_page",
+      "mcp__chrome__resize_page",
+      "mcp__chrome__take_snapshot",
+      "Bash",
+      "Grep",
+      "Read",
+      "mcp__chrome__take_screenshot",
+      "mcp__chrome__take_snapshot",
+      "mcp__chrome__evaluate_script",
+      "Bash",
+      "Bash",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__performance_start_trace",
+      "mcp__chrome__click",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__performance_stop_trace",
+      "mcp__chrome__performance_analyze_insight",
+      "mcp__chrome__evaluate_script",
+      "mcp__chrome__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__chrome__new_page": 1,
+      "mcp__chrome__resize_page": 1,
+      "mcp__chrome__take_snapshot": 2,
+      "Bash": 3,
+      "Grep": 1,
+      "Read": 1,
+      "mcp__chrome__take_screenshot": 1,
+      "mcp__chrome__evaluate_script": 15,
+      "mcp__chrome__performance_start_trace": 1,
+      "mcp__chrome__click": 1,
+      "mcp__chrome__performance_stop_trace": 1,
+      "mcp__chrome__performance_analyze_insight": 1
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_018bCkJgv3PSQcssSxwQcw8c",
+        "error": "Permission to use Bash has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomp"
+      },
+      {
+        "tool_use_id": "toolu_01SE69aJgxpiFfiW8hpzzoJ2",
+        "error": "<tool_use_error>Error: No such tool available: Grep</tool_use_error>"
+      },
+      {
+        "tool_use_id": "toolu_011EekWXRrykPpwMwDg9vS3z",
+        "error": "<tool_use_error>Error: No such tool available: Read</tool_use_error>"
+      },
+      {
+        "tool_use_id": "toolu_01Xo8aCCjpHACF5CfQp9bRTq",
+        "error": "Exit code 127\n(eval):1: command not found: agent-react-devtools"
+      },
+      {
+        "tool_use_id": "toolu_015pZcYPjnsoGMM25XjKrasy",
+        "error": "Permission to use Bash has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomp"
+      },
+      {
+        "tool_use_id": "toolu_01EgdfuM3LpFJUvd5dAHvc31",
+        "error": "Error: Element uid \"D15B\" not found on page 2."
+      }
+    ],
+    "permission_denials": [
+      {
+        "tool_name": "Bash",
+        "tool_use_id": "toolu_018bCkJgv3PSQcssSxwQcw8c",
+        "tool_input": {
+          "command": "cat /Users/marvelken-anele/.claude/projects/-Users-marvelken-anele-mcp-bench-sandbox-trackB-chrome-layerB-r0/01d240a7-1b67-4b68-bc13-961d3a1d310e/tool-results/mcp-chrome-take_snapshot-1791334704129.txt | python3 -c \"import sys,json; data=json.load(sys.stdin); text=data[0]['text']; lines=text.split('\\n'); [print(f'{i}: {l}') for i,l in enumerate(lines) if 'note' in l.lower() or 'Note' in l or 'textarea' in l.lower() or 'textbox' in l.lower()]\"",
+          "description": "Search snapshot for notes/textarea elements"
+        }
+      },
+      {
+        "tool_name": "Bash",
+        "tool_use_id": "toolu_015pZcYPjnsoGMM25XjKrasy",
+        "tool_input": {
+          "command": "which agent-react-devtools 2>/dev/null || ls /usr/local/bin/agent-react* 2>/dev/null || ls /opt/homebrew/bin/agent-react* 2>/dev/null || echo \"not found in typical paths\"",
+          "description": "Find agent-react-devtools binary"
+        }
+      }
+    ],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `TableRow` component (1500 instances, not memoized) calls `useAppContext()` to read `theme`, subscribing it to the same React Context that holds `draftNote` state. Every keystroke in the notes textarea updates `draftNote` in `AppProvider`, creating a new context value object and forcing all 1500 `TableRow` components to re-render — each one re-creating ~8 expensive `Intl.*` formatter objects per render.",
+      "evidence": "`evaluate_script` revealed `TableRow`'s source calls `useAppContext()` and creates `Intl.DateTimeFormat`, `Intl.NumberFormat` (×6 including 5 locales), `Intl.RelativeTimeFormat`, and `Intl.Collator` on every render. `AppProvider` stores `draftNote` in state and passes an un-memoized object to `AppContext.Provider`. Timing a single keystroke via native input setter measured ~350-520ms per character, confirming the slowness.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackB-chrome-layerB-r0": {
+    "error": "Could not parse transcript"
+  },
+  "trackB-firefox-layerB-r0": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 189.823,
+    "num_turns": 26,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 738890,
+    "output_tokens": 4612,
+    "cache_creation_tokens": 52395,
+    "cache_read_tokens": 686475,
+    "total_tokens": 743502,
+    "cost_usd": 0.78610625,
+    "tool_calls": [
+      "mcp__firefox__set_viewport_size",
+      "mcp__firefox__navigate_page",
+      "mcp__firefox__take_snapshot",
+      "mcp__firefox__screenshot_page",
+      "mcp__firefox__enable_debugger",
+      "Bash",
+      "mcp__firefox__list_scripts",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__profiler_start",
+      "mcp__firefox__click_by_uid",
+      "mcp__firefox__type_text",
+      "mcp__firefox__profiler_stop",
+      "mcp__firefox__clear_console_messages",
+      "mcp__firefox__set_logpoint",
+      "mcp__firefox__type_text",
+      "mcp__firefox__get_logpoint_results",
+      "mcp__firefox__remove_logpoint",
+      "mcp__firefox__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__firefox__set_viewport_size": 1,
+      "mcp__firefox__navigate_page": 1,
+      "mcp__firefox__take_snapshot": 1,
+      "mcp__firefox__screenshot_page": 1,
+      "mcp__firefox__enable_debugger": 1,
+      "Bash": 1,
+      "mcp__firefox__list_scripts": 1,
+      "mcp__firefox__get_script_source": 7,
+      "mcp__firefox__evaluate_script": 2,
+      "mcp__firefox__profiler_start": 1,
+      "mcp__firefox__click_by_uid": 1,
+      "mcp__firefox__type_text": 2,
+      "mcp__firefox__profiler_stop": 1,
+      "mcp__firefox__clear_console_messages": 1,
+      "mcp__firefox__set_logpoint": 1,
+      "mcp__firefox__get_logpoint_results": 1,
+      "mcp__firefox__remove_logpoint": 1
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01PtPP9Lsu3vwWJuD6y9b42j",
+        "error": "Exit code 127\n(eval):1: command not found: agent-react-devtools"
+      }
+    ],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `TableRow` component in `ActivityTable.tsx` consumes `AppContext` (to read `theme`), which also contains `draftNote`. Every keystroke updates `draftNote`, causing all 1500 memoized `TableRow` components to re-render (context changes bypass `memo`), each re-creating ~10 expensive `Intl.*` formatter instances inline.",
+      "evidence": "`get_script_source` showed `TableRow` calls `useAppContext()` and creates multiple `Intl.DateTimeFormat`, `Intl.NumberFormat` (×3 + ×5 locales), `Intl.RelativeTimeFormat`, and `Intl.Collator` on every render. `evaluate_script` measured a single keystroke at 208ms. The table has 1500 rows (`document.querySelectorAll('tbody tr').length`). `AppContext` bundles `draftNote` and `theme` in one context with an unmemoized value object.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackB-firefox-layerB-r2": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 133.852,
+    "num_turns": 27,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 684175,
+    "output_tokens": 4249,
+    "cache_creation_tokens": 41718,
+    "cache_read_tokens": 642438,
+    "total_tokens": 688424,
+    "cost_usd": 0.6882765000000001,
+    "tool_calls": [
+      "mcp__firefox__set_viewport_size",
+      "mcp__firefox__navigate_page",
+      "mcp__firefox__take_snapshot",
+      "mcp__firefox__screenshot_page",
+      "mcp__firefox__enable_debugger",
+      "Bash",
+      "mcp__firefox__list_scripts",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__get_script_source",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__profiler_start",
+      "mcp__firefox__click_by_uid",
+      "mcp__firefox__type_text",
+      "mcp__firefox__profiler_stop",
+      "mcp__firefox__set_logpoint",
+      "mcp__firefox__click_by_uid",
+      "mcp__firefox__type_text",
+      "mcp__firefox__get_logpoint_results",
+      "mcp__firefox__remove_logpoint",
+      "mcp__firefox__evaluate_script",
+      "mcp__firefox__evaluate_script"
+    ],
+    "tool_counts": {
+      "mcp__firefox__set_viewport_size": 1,
+      "mcp__firefox__navigate_page": 1,
+      "mcp__firefox__take_snapshot": 1,
+      "mcp__firefox__screenshot_page": 1,
+      "mcp__firefox__enable_debugger": 1,
+      "Bash": 1,
+      "mcp__firefox__list_scripts": 1,
+      "mcp__firefox__get_script_source": 7,
+      "mcp__firefox__evaluate_script": 3,
+      "mcp__firefox__profiler_start": 1,
+      "mcp__firefox__click_by_uid": 2,
+      "mcp__firefox__type_text": 2,
+      "mcp__firefox__profiler_stop": 1,
+      "mcp__firefox__set_logpoint": 1,
+      "mcp__firefox__get_logpoint_results": 1,
+      "mcp__firefox__remove_logpoint": 1
+    },
+    "tool_errors": [],
+    "permission_denials": [],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `TableRow` component in `ActivityTable.tsx` calls `useAppContext()` to read `theme`, but the same context also holds `draftNote`. Since `memo()` cannot block re-renders triggered by context changes, every keystroke in the notes textarea re-renders all 1500 `TableRow` instances, each of which recreates expensive `Intl.*` formatter objects (DateTimeFormat, NumberFormat in 5 locales, RelativeTimeFormat, Collator) on every render.",
+      "evidence": "Reading `ActivityTable.tsx` source via `get_script_source` showed `TableRow` is wrapped in `memo()` but calls `useAppContext()` (which includes `draftNote`); `AppContext.tsx` source showed `draftNote` and `theme` share one context with no `useMemo` on the value; `evaluate_script` measured ~199ms per keystroke; the table has 1500 rows (confirmed via `querySelectorAll('tbody tr').length`).",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  },
+  "trackB-safari-layerB-r0.contaminated": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 244.075,
+    "num_turns": 31,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 512488,
+    "output_tokens": 9431,
+    "cache_creation_tokens": 12720,
+    "cache_read_tokens": 499738,
+    "total_tokens": 521919,
+    "cost_usd": 0.5652940000000001,
+    "tool_calls": [
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__navigate_to_url",
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__get_page_content",
+      "Bash",
+      "Bash",
+      "Bash",
+      "Read",
+      "mcp__safari__screenshot",
+      "mcp__safari__get_page_content",
+      "mcp__safari__get_page_content",
+      "mcp__safari__get_page_content",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript"
+    ],
+    "tool_counts": {
+      "mcp__safari__set_viewport_size": 2,
+      "mcp__safari__navigate_to_url": 1,
+      "mcp__safari__get_page_content": 4,
+      "Bash": 3,
+      "Read": 1,
+      "mcp__safari__screenshot": 1,
+      "mcp__safari__evaluate_javascript": 18
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_01BuxKuCLWfxvZC6gUYoK7eb",
+        "error": "Tool error: Command failed: No active tab"
+      },
+      {
+        "tool_use_id": "toolu_016z68bkXjMcLpr5UyHfsW7T",
+        "error": "Exit code 127\n(eval):1: command not found: agent-react-devtools"
+      },
+      {
+        "tool_use_id": "toolu_0127Je8wHpQEw72My5youU3L",
+        "error": "Permission to use Bash has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomp"
+      },
+      {
+        "tool_use_id": "toolu_01KAGVsAm61XrZWfcTupeV6j",
+        "error": "<tool_use_error>Cancelled: parallel tool call Bash(which agent-react-devtools 2>/dev/null |…) errored</tool_use_error>"
+      },
+      {
+        "tool_use_id": "toolu_01Bt1KiS3rJYZ1kFjVHMnZ9R",
+        "error": "<tool_use_error>Error: No such tool available: Read</tool_use_error>"
+      },
+      {
+        "tool_use_id": "toolu_01YHXqWPzUyDwsSc9aw6bhxZ",
+        "error": "Tool error: Command failed: evaluateJavaScriptFunction: JavaScript execution exceeded its timeout: script timed out after 30000ms"
+      },
+      {
+        "tool_use_id": "toolu_015ZmcxTeTjpaMB6csAsKoST",
+        "error": "Tool error: Command failed: evaluateJavaScriptFunction: A JavaScript exception occured: undefined is not an object (evaluating 'tableRowFiber.type.type.toString')"
+      }
+    ],
+    "permission_denials": [
+      {
+        "tool_name": "Bash",
+        "tool_use_id": "toolu_0127Je8wHpQEw72My5youU3L",
+        "tool_input": {
+          "command": "which agent-react-devtools 2>/dev/null || find /usr/local/bin /opt/homebrew/bin /Users/marvelken-anele -maxdepth 3 -name \"agent-react-devtools\" 2>/dev/null | head -5"
+        }
+      }
+    ],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "Each of the 1,500 `TableRow` components subscribes to the app context (via `useAppContext()`) which includes `draftNote`. Every keystroke updates `draftNote`, forcing all 1,500 rows to re-render and re-create expensive `Intl` formatters (DateTimeFormat, NumberFormat across 5 locales, RelativeTimeFormat, Collator) on each render.",
+      "evidence": "The `TableRow` source (extracted via React fiber) shows `const { theme } = useAppContext()` at the top, subscribing to the context that also carries `draftNote` and `setDraftNote`. The context value (inspected via the provider fiber's `memoizedProps.value`) contains `{ user, theme, draftNote, setDraftNote }`. There are 1,500 rows (`tbody.children.length === 1500`, 12,101 total DOM elements). A simulated single keystroke timed out after 30 seconds. All evidence gathered via `evaluate_javascript` on the React fiber tree.",
+      "confidence": "high",
+      "could_not_see": "React DevTools profiler flamegraph (agent-react-devtools CLI was not available); could not directly measure per-row render time or confirm exact re-render count via profiling."
+    }
+  },
+  "trackB-safari-layerB-r0": {
+    "error": "Could not parse transcript"
+  },
+  "trackB-safari-layerB-r1.contaminated": {
+    "model": "claude-opus-4-6",
+    "wall_time_s": 188.553,
+    "num_turns": 33,
+    "finished": true,
+    "hit_cap": false,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "input_tokens": 611017,
+    "output_tokens": 8418,
+    "cache_creation_tokens": 15223,
+    "cache_read_tokens": 595761,
+    "total_tokens": 619435,
+    "cost_usd": 0.60363925,
+    "tool_calls": [
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__navigate_to_url",
+      "mcp__safari__set_viewport_size",
+      "mcp__safari__get_page_content",
+      "Bash",
+      "Read",
+      "mcp__safari__screenshot",
+      "Bash",
+      "Bash",
+      "mcp__safari__get_page_content",
+      "mcp__safari__get_page_content",
+      "mcp__safari__get_page_content",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript",
+      "mcp__safari__evaluate_javascript"
+    ],
+    "tool_counts": {
+      "mcp__safari__set_viewport_size": 2,
+      "mcp__safari__navigate_to_url": 1,
+      "mcp__safari__get_page_content": 4,
+      "Bash": 3,
+      "Read": 1,
+      "mcp__safari__screenshot": 1,
+      "mcp__safari__evaluate_javascript": 20
+    },
+    "tool_errors": [
+      {
+        "tool_use_id": "toolu_011rcWmCgDPfEzkTB1pJ1Cy1",
+        "error": "Tool error: Command failed: No active tab"
+      },
+      {
+        "tool_use_id": "toolu_01Sn5rVrVpmLcXz3gYhz9bpx",
+        "error": "Permission to use Bash has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomp"
+      },
+      {
+        "tool_use_id": "toolu_01EPRPDUKdinxuxd37i9URK4",
+        "error": "<tool_use_error>Error: No such tool available: Read</tool_use_error>"
+      },
+      {
+        "tool_use_id": "toolu_01KBkbJPNJXRzTdBNT4EV36f",
+        "error": "Exit code 127\n(eval):1: command not found: agent-react-devtools"
+      },
+      {
+        "tool_use_id": "toolu_01HUsYuhvEx9EVPay1co66Jh",
+        "error": "Permission to use Bash has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomp"
+      },
+      {
+        "tool_use_id": "toolu_01Wao7eM4Yi79jFbBRy6SB7U",
+        "error": "Tool error: Command failed: evaluateJavaScriptFunction: A JavaScript exception occured: JSON.stringify cannot serialize cyclic structures."
+      }
+    ],
+    "permission_denials": [
+      {
+        "tool_name": "Bash",
+        "tool_use_id": "toolu_01Sn5rVrVpmLcXz3gYhz9bpx",
+        "tool_input": {
+          "command": "head -200 '/var/folders/qh/sftn8gtd52jfzfg0032x5jd80000gn/T/com.apple.WebDriver/safari-mcp-44E689F3-9702-46C8-919B-D0DAE4563735.txt'"
+        }
+      },
+      {
+        "tool_name": "Bash",
+        "tool_use_id": "toolu_01HUsYuhvEx9EVPay1co66Jh",
+        "tool_input": {
+          "command": "which agent-react-devtools 2>&1 || find /usr/local/bin /opt/homebrew/bin /usr/bin ~/.npm-global/bin -name \"agent-react-devtools\" 2>/dev/null || npm list -g agent-react-devtools 2>&1 | head -5"
+        }
+      }
+    ],
+    "read_app_source": false,
+    "final_block": {
+      "root_cause": "The `NotesBox` textarea's `draftNote` state lives in `AppProvider`'s context, so every keystroke re-renders all 1500 un-memoized `TableRow` components that consume that context (each creating ~10 expensive `Intl` formatter objects per render).",
+      "evidence": "`AppProvider` source shows `draftNote`/`setDraftNote` in the context value as an inline object; `TableRow` source shows `const { theme } = useAppContext()` plus per-render `Intl.NumberFormat`/`DateTimeFormat`/`RelativeTimeFormat`/`Collator` construction; DOM query counted 1500 `<tr>` elements; instrumented render measurement showed a single character input taking 1457ms. All found via `evaluate_javascript`.",
+      "confidence": "high",
+      "could_not_see": "nothing"
+    }
+  }
+}

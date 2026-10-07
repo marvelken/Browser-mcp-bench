@@ -42,9 +42,15 @@ const REQUIRED_FACTS = {
 
 function gradeRun(runId, parsed) {
   // Extract bug from runId
+  let bug;
   const bugMatch = runId.match(/bug(\d)/);
-  if (!bugMatch) return null;
-  const bug = `bug${bugMatch[1]}`;
+  if (bugMatch) {
+    bug = `bug${bugMatch[1]}`;
+  } else if (runId.startsWith('trackB-')) {
+    bug = 'bug4'; // Track B runs are always bug 4
+  } else {
+    return null;
+  }
   const facts = REQUIRED_FACTS[bug];
   if (!facts) return null;
 

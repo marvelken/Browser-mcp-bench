@@ -10,7 +10,7 @@
 - **Node:** v22.14.0
 - **npm:** 10.9.2
 - **Claude Code:** 2.1.97
-- **Model:** (will be read from system/init events; expected Opus 4.6)
+- **Model:** claude-opus-4-6 (confirmed from all transcript system/init events)
 - **`~/.claude/CLAUDE.md`:** does not exist
 
 ### Pinned package versions
@@ -235,29 +235,380 @@ All three correctly diagnosed bug 3 (different API shape for project 5) with hig
 Safari was notably slower (25 turns vs 12-13). Chrome and Firefox both found it quickly.
 
 ## 6. Track A results: browser MCP alone
-| Bug | Browser | Scores per run | Median time | Median turns | Median total tokens | Hit a cap |
+
+Each cell is one scored run. RUNS_PER_CELL was set to 1; some cells have two runs because earlier runs produced parse errors and were retried with a different random seed. Parse-error runs (no `result` event in the transcript) are marked ERR and excluded from scoring.
+
+| Bug | Browser | Score | Time (s) | Turns | Total tokens | Cost |
 | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Chrome | 2 | 123 | 19 | 198,960 | $0.34 |
+| 1 | Firefox | 2 | 59 | 11 | 176,242 | $0.35 |
+| 1 | Safari | 2 | 94 | 16 | 150,637 | $0.23 |
+| 1 | Safari | 2 | 122 | 19 | 250,763 | $0.36 |
+| 2 | Chrome | 2 | 109 | 14 | 241,542 | $0.30 |
+| 2 | Chrome | 2 | 99 | 9 | 154,294 | $0.26 |
+| 2 | Firefox | 2 | 55 | 8 | 104,172 | $0.18 |
+| 2 | Firefox | 2 | 101 | 16 | 266,499 | $0.33 |
+| 2 | Safari | 2 | 86 | 15 | 203,299 | $0.31 |
+| 3 | Chrome | 2 | 68 | 14 | 179,945 | $0.21 |
+| 3 | Firefox | 2 | 91 | 21 | 269,056 | $0.33 |
+| 3 | Firefox | 2 | 42 | 10 | 96,780 | $0.21 |
+| 3 | Safari | 2 | 82 | 17 | 243,823 | $0.31 |
+| 4 | Chrome | 2 | 398 | 26 | 500,693 | $0.55 |
+| 4 | Firefox | 2 | 76 | 13 | 225,095 | $0.34 |
+| 4 | Safari | ERR | — | — | — | — |
+
+Parse errors (no result event): trackA-chrome-bug1-r2, trackA-chrome-bug3-r2, trackA-chrome-bug4-r2, trackA-firefox-bug4-r2, trackA-safari-bug3-r2, trackA-safari-bug4-r0.
+
+### Per-cell notes
+
+**Bug 1 (network waterfall):** All three browsers found it. Firefox was fastest (59s, 11 turns) — it used `enable_debugger` + `list_scripts` + `get_script_source` to read the actual `CardRow.tsx` source and quoted the offending `for...of` loop verbatim. Chrome took 123s using `list_network_requests` + repeated `get_network_request` calls to build a timing table, then confirmed with `performance_analyze_insight`. Safari needed a page reload to populate the network buffer (it does not retain pre-session network traffic), adding overhead.
+
+**Bug 2 (CSS layout break):** The easiest bug. Firefox solved it in 55s / 8 turns — the fastest single run in the entire benchmark. Chrome also solved it quickly (99s on its better run). All three browsers used `evaluate_script` to inspect computed CSS styles after taking a screenshot that showed the horizontal overflow.
+
+**Bug 3 (console error):** Firefox had the widest spread (42s to 91s). Chrome found it in 68s by comparing raw network payloads via `get_network_request`. Safari and Firefox used similar strategies — snapshot, then network inspection — and all correctly identified `/api/projects/5/stats` returning `{data: {...}}` instead of the flat shape.
+
+**Bug 4 (re-render cascade) — the decisive bug:** This is where the browsers diverged most. Firefox solved it in 76s / 13 turns by reading source code directly (`get_script_source` on `AppContext.tsx`, `ActivityTable.tsx`, `NotesBox.tsx`). Chrome took 398s / 26 turns — over 5x longer — because it lacked source-reading tools and had to reverse-engineer the component structure through React fiber introspection via `evaluate_script`. Mid-run, Chrome's performance trace crashed the tab (`MCP error -32000: Connection closed`), forcing a recovery. Safari's run never completed (parse error / timeout), likely because its 30-second JavaScript evaluation timeout killed the profiling script.
 
 ## 7. Track B results: React layer on bug 4
-| Setup | Scores per run | Median time | Median turns | Median total tokens |
-| --- | --- | --- | --- | --- |
+
+Track B tested whether adding a React-specific debugging layer improves bug 4 diagnosis. Only bug 4 was tested. Contaminated runs (where the agent used unauthorized shell commands like `cat` or `which` alongside the intended tools) are marked; their scores are shown but should be discounted.
+
+| Setup | Score | Time (s) | Turns | Total tokens | Cost | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Chrome + Layer A (react-devtools-cdt-mcp) | 2 | 144 | 28 | 493,518 | $0.52 | Clean. Used React profiler. |
+| Chrome + Layer B (agent-react-devtools) | ERR | — | — | — | — | Tab crashed before result. |
+| Firefox + Layer B (agent-react-devtools) | 2 | 190 | 26 | 743,502 | $0.79 | Clean. CLI not found; used native Firefox tools. |
+| Firefox + Layer B (agent-react-devtools) | 2 | 134 | 27 | 688,424 | $0.69 | Clean. Same fallback strategy. |
+| Safari + Layer B (agent-react-devtools) | ERR | — | — | — | — | JS timeout, "App not found". |
+| Chrome + Layer B (contaminated) | 2 | 223 | 30 | 737,956 | $0.64 | Used `cat`, `which` via Bash. |
+| Safari + Layer B (contaminated) | 2 | 244 | 31 | 521,919 | $0.57 | Used `cat`, `which` via Bash. |
+| Safari + Layer B (contaminated) | 2 | 189 | 33 | 619,435 | $0.60 | Used `cat`, `which` via Bash. |
+
+### Key observations
+
+**Layer A (react-devtools-cdt-mcp on Chrome):** The React profiler gave a precise count unavailable in Track A: "Each keystroke causes **13,606 components to re-render** taking ~180–328ms." The commit report was 2.1M characters, too large for the context window. The agent correctly identified `Memo(TableRow)` consuming `AppContext` directly, defeating `React.memo`. However, at 144s it was slower than Firefox Track A (76s), which found the same bug by reading source code.
+
+**Layer B (agent-react-devtools):** The `agent-react-devtools` CLI binary was not on PATH in any run. Every Layer B run got `command not found` (exit code 127) when trying `agent-react-devtools --help`. The Firefox runs recovered gracefully by falling back to native `list_scripts` + `get_script_source`. The Chrome and Safari runs struggled without source-reading alternatives and either crashed or timed out.
+
+**Net effect of React layers:** Layer A provided unique profiler data but was slower than Firefox's native source-reading ability. Layer B added no value in practice because the CLI was unreachable. Firefox Track A (browser MCP alone) remains the fastest correct diagnosis of bug 4.
 
 ## 8. What each tool could not see
 
+### Chrome (chrome-devtools-mcp)
+- **No source code access.** Chrome MCP has no equivalent of Firefox's `enable_debugger` / `list_scripts` / `get_script_source`. The agent resorted to React fiber introspection via `evaluate_script`, which is brittle and slow.
+- **Snapshot token overflow.** The full accessibility snapshot (562K characters) exceeded the context window, forcing the agent to save it to disk — then discovering that `Read` and `Bash` were not in the allowed tool set.
+- **Performance trace instability.** Tracing a 1,500-row re-render crashed the Chrome tab. The agent recovered by opening a new page, but lost the trace data.
+
+### Firefox (@mozilla/firefox-devtools-mcp)
+- **Nothing missing for these bugs.** Firefox runs reported `could_not_see: "nothing"` on every completed run. The `developer` preset provided network, console, profiler, and crucially, source code access.
+
+### Safari (safaridriver --mcp)
+- **No source code access.** Like Chrome, Safari has no script-reading tools.
+- **No pre-session network buffer.** Network requests made before the MCP session started are not captured. The agent had to reload the page to see any network traffic.
+- **30-second JavaScript evaluation timeout.** Profiling scripts that ran fine in Chrome and Firefox timed out in Safari, killing the bug 4 run entirely.
+- **"No active tab" errors.** Safari MCP requires a navigation as the first action. Any other tool call before `navigate_to_url` returns an error.
+- **Attempted `Read` and `Bash` (unavailable).** Safari runs tried to read WebDriver temp files and use shell commands — both blocked by the tool allowlist.
+
 ## 9. Failures worth telling
+
+### Chrome bug 4: page crash mid-trace
+The Chrome agent started a performance trace, typed "hello world test" into the notes textarea (triggering ~5 keystroke re-renders of 1,500 rows), then tried to stop the trace. Chrome returned `MCP error -32000: Connection closed` — the tab had crashed under the trace overhead. The agent calmly said: "Page crashed during trace. Let me reopen and measure differently." It opened a new page, repeated the investigation without the trace, and still got the right answer — but it took 398 seconds.
+
+### Safari bug 4: timeout without result
+Safari's bug 4 run never completed. The agent identified the 1,500-row table and observed "26 mutations on a single keystroke including `td` attribute changes" but couldn't profile the re-render mechanism. Its `evaluate_javascript` call timed out at 30 seconds when trying to measure keystroke latency. The run produced no `result` event.
+
+### Layer B: CLI not on PATH
+Every `agent-react-devtools` Layer B run attempted `agent-react-devtools --help` and got `command not found` (exit code 127). The Vite plugin was configured and the daemon was running on port 8097, but the CLI binary was not on the spawned process's PATH. Firefox recovered by ignoring the missing tool and using native debugger tools. Chrome and Safari had no such fallback.
+
+### Chrome bug 2: snapshot too large, tried filesystem
+Chrome's `take_snapshot` on bug 2 returned 562,941 characters, exceeding the context limit. The MCP server saved it to a temp file and returned the path. The agent then tried to call `Read` and `Bash` to access the file — but these tools were blocked by `--allowedTools`. After two tool errors, it pivoted to `evaluate_script` and solved the bug via targeted CSS queries.
+
+### Contaminated Layer B runs
+Three Layer B runs (chrome-layerB, safari-layerB x2) were flagged as contaminated because the agent used Bash commands like `which agent-react-devtools`, `cat package.json`, and `ls node_modules` to explore the project filesystem. These shell commands gave unfair access to project structure. The contaminated runs still scored 2/2, but their approach — reading configuration files via shell — is not what the benchmark intended to measure.
 
 ## 10. Surprises
 
+1. **Every completed run scored 2/2.** All 21 successfully parsed runs achieved a perfect score. No partial (1) or wrong (0) diagnoses. The bugs were designed to be findable through browser tools, and Claude Opus 4.6 found them all — though with very different speed and cost depending on the browser.
+
+2. **Firefox was consistently fastest.** Bug 2 in 55s (8 turns), bug 1 in 59s (11 turns), bug 4 in 76s (13 turns). Firefox's `get_script_source` tool turned bug 4 from a 398-second ordeal (Chrome) into a 76-second read-the-code exercise.
+
+3. **Source code access was the deciding factor on bug 4.** The agent diagnosed bugs 1–3 comparably across all browsers using network logs, screenshots, and CSS inspection. Bug 4 required understanding React component architecture, and without source code, Chrome spent 5x longer reverse-engineering it through fiber introspection.
+
+4. **React DevTools (Layer A) was slower than Firefox alone.** Chrome + react-devtools-cdt-mcp took 144s for bug 4. Firefox without any React tooling took 76s. The React profiler provided richer data (exact re-render counts) but at higher cost.
+
+5. **Safari could not handle bug 4 at all.** Its 30-second JS eval timeout is a hard constraint. Profiling workloads that generate hundreds of milliseconds of main-thread work cannot be measured through Safari's `evaluate_javascript`.
+
+6. **Chrome crashed under its own performance trace.** Tracing 1,500 row re-renders was enough to kill the tab — an unexpected reliability gap.
+
+7. **agent-react-devtools was unreachable in every run.** Despite correct configuration (Vite plugin active, daemon running on 8097), the CLI binary wasn't on PATH. This turned every Layer B run into an accidental test of graceful degradation.
+
+8. **Firefox found a secondary amplifier Chrome missed.** Both browsers identified the context re-render as the root cause. But Firefox, by reading the source code, also identified that each of the 1,500 `TableRow` re-renders creates ~12 `Intl` formatter instances (DateTimeFormat, 5 locale-specific NumberFormats, RelativeTimeFormat, Collator, etc.), totaling ~18,000 `Intl` constructor calls per keystroke.
+
 ## 11. Quotable moments
+
+All quotes are verbatim from Claude Opus 4.6 run transcripts.
+
+**Chrome on bug 4, after the page crashed:**
+> "Page crashed during trace. Let me reopen and measure differently."
+> — `trackA-chrome-bug4-r0`, turn 18
+
+**Firefox on bug 4, after reading the source:**
+> "Found it. Let me verify the number of activity rows and confirm the mechanism."
+> — `trackA-firefox-bug4-r0`, turn 9
+
+**Chrome + Layer A, on the profiler output:**
+> "Each keystroke causes **13,606 components to re-render** taking ~180–328ms."
+> — `trackB-chrome-layerA-r0`, turn 20
+
+**Chrome + Layer A, on the commit report:**
+> "The commit report is 2.1M characters. Let me read just the top components (sorted by actualDuration desc)."
+> — `trackB-chrome-layerA-r0`, turn 22
+
+**Safari on bug 1, discovering the empty network buffer:**
+> "The network buffer is empty since the page already loaded. Let me reload and capture network requests."
+> — `trackA-safari-bug1-r0`, turn 4
+
+**Safari on bug 4, before the timeout:**
+> "The scrollable activity table has a content size of 1166×42618 pixels — that's enormous."
+> — `trackA-safari-bug4-r0`, turn 8
+
+**Firefox Layer B, after CLI not found:**
+> "1000 console messages cleared already — that's telling."
+> — `trackB-firefox-layerB-r0`, turn 14 (recognized the cleared buffer as indirect evidence of massive re-render volume)
+
+**Chrome on bug 2, after snapshot overflow:**
+> "I can see the cards spilling off the right edge. Let me inspect the structure and CSS."
+> — `trackA-chrome-bug2-r0`, turn 3
 
 ## 12. Score table
 
+Mean score per browser per bug (max 2.0). Only completed (non-ERR) runs included.
+
+| Bug | Chrome | Firefox | Safari |
+| --- | --- | --- | --- |
+| 1 | 2.00 (n=1) | 2.00 (n=1) | 2.00 (n=2) |
+| 2 | 2.00 (n=2) | 2.00 (n=2) | 2.00 (n=1) |
+| 3 | 2.00 (n=1) | 2.00 (n=2) | 2.00 (n=1) |
+| 4 | 2.00 (n=1) | 2.00 (n=1) | — (n=0) |
+| **Overall** | **2.00** | **2.00** | **2.00** |
+
+Note: Perfect scores across the board make the score table less interesting than the speed and cost tables. The real differentiation is in _how_ and _how fast_ each browser found the answer, not _whether_ it did.
+
+### Speed comparison (median seconds per completed run)
+
+| Bug | Chrome | Firefox | Safari |
+| --- | --- | --- | --- |
+| 1 | 123 | 59 | 108 |
+| 2 | 104 | 78 | 86 |
+| 3 | 68 | 67 | 82 |
+| 4 | 398 | 76 | — |
+
+### Cost comparison (median USD per completed run)
+
+| Bug | Chrome | Firefox | Safari |
+| --- | --- | --- | --- |
+| 1 | $0.34 | $0.35 | $0.30 |
+| 2 | $0.28 | $0.26 | $0.31 |
+| 3 | $0.21 | $0.27 | $0.31 |
+| 4 | $0.55 | $0.34 | — |
+
+### Track B: bug 4 with React layers (clean runs only)
+
+| Setup | Score | Time (s) | Cost |
+| --- | --- | --- | --- |
+| Chrome + Layer A | 2.00 | 144 | $0.52 |
+| Firefox + Layer B | 2.00 | 162 | $0.74 |
+| Firefox alone (Track A) | 2.00 | 76 | $0.34 |
+| Chrome alone (Track A) | 2.00 | 398 | $0.55 |
+
 ## 13. Grades that need human review
+
+The auto-grader flagged 8 runs for human review. All are parse errors (no `result` event in the transcript), not questionable scores. There are no score=1 or ambiguous-keyword-match cases.
+
+| Run ID | Issue |
+| --- | --- |
+| trackA-chrome-bug1-r2 | No result event (timeout or crash) |
+| trackA-chrome-bug3-r2 | No result event |
+| trackA-chrome-bug4-r2 | No result event |
+| trackA-firefox-bug4-r2 | No result event |
+| trackA-safari-bug3-r2 | No result event |
+| trackA-safari-bug4-r0 | No result event (Safari JS timeout on bug 4) |
+| trackB-chrome-layerB-r0 | No result event (tab crash) |
+| trackB-safari-layerB-r0 | No result event (JS timeout, "App not found") |
+
+Recommendation: Review the raw transcripts for these runs to confirm whether the agent was on the right track before the run ended. The Safari bug 4 run (trackA-safari-bug4-r0) is particularly interesting — the agent had identified the 1,500-row table and observed DOM mutation patterns but couldn't profile the re-render mechanism before timing out.
 
 ## 14. Diagrams
 
+### Test setup
+
+```mermaid
+graph TD
+    subgraph "Test Harness (run.mjs)"
+        H[Harness] -->|spawns| CC[Claude Code<br/>claude -p]
+        H -->|starts| APP[Vite dev server<br/>localhost:5173]
+        H -->|writes| TX[Transcript .jsonl]
+    end
+
+    subgraph "MCP Servers (one per run)"
+        CC -->|MCP| CHR[chrome-devtools-mcp<br/>30 tools]
+        CC -->|MCP| FF[firefox-devtools-mcp<br/>48 tools]
+        CC -->|MCP| SAF[safaridriver --mcp<br/>17 tools]
+    end
+
+    subgraph "React Layers (Track B only)"
+        CHR -->|3P tools| RLA[react-devtools-cdt-mcp<br/>Layer A, 12 tools]
+        CC -->|Bash CLI| RLB[agent-react-devtools<br/>Layer B, CLI]
+    end
+
+    CHR -->|controls| BR1[Chrome 154]
+    FF -->|controls| BR2[Firefox 157]
+    SAF -->|controls| BR3[Safari 27]
+
+    BR1 --> APP
+    BR2 --> APP
+    BR3 --> APP
+```
+
+### Bug 4 re-render cascade
+
+```mermaid
+sequenceDiagram
+    participant U as User types in NotesBox
+    participant AP as AppProvider
+    participant CTX as AppContext
+    participant AT as ActivityTable
+    participant TR as TableRow x1500
+
+    U->>AP: onChange → setDraftNote("a")
+    AP->>CTX: new value object {user, theme, draftNote:"a", setDraftNote}
+    CTX->>AT: context changed → re-render
+    AT->>TR: .map() → 1500 TableRow calls
+    Note over TR: memo() cannot block:<br/>useContext(AppContext)<br/>sees new object reference
+    TR->>TR: Each row creates ~12 Intl formatters
+    Note over TR: 1500 × 12 = ~18,000<br/>Intl constructor calls<br/>per keystroke
+```
+
+### Decision chart: which tool for which bug
+
+```mermaid
+flowchart TD
+    START[Bug symptom observed] --> Q1{Visible in screenshot?}
+
+    Q1 -->|Layout overflow| B2[Bug 2: CSS]
+    Q1 -->|Error message on card| B3A[Check console + network]
+    Q1 -->|Slow load / blank stats| B1A[Check network timing]
+    Q1 -->|Typing lag| B4A[Profile re-renders]
+
+    B1A --> B1{Network waterfall?}
+    B1 -->|Sequential requests| B1R[Bug 1: await in loop]
+
+    B3A --> B3{API shape mismatch?}
+    B3 -->|One endpoint different| B3R[Bug 3: nested data wrapper]
+
+    B4A --> B4{Source code accessible?}
+    B4 -->|Yes: Firefox| B4FF[Read source directly<br/>~76s]
+    B4 -->|No: Chrome| B4CH[Fiber introspection<br/>~398s]
+    B4 -->|No: Safari| B4SF[JS eval timeout<br/>FAIL]
+
+    style B4FF fill:#2d6,color:#fff
+    style B4CH fill:#f90,color:#fff
+    style B4SF fill:#d33,color:#fff
+```
+
 ## 15. Screenshots needed
+
+1. **App at 1280x720 showing bug 2** — the horizontal overflow caused by "InfrastructureMonitoringDashboardForProductionServices". Take from any Chrome run screenshot.
+2. **Network waterfall (bug 1)** — Chrome DevTools network panel showing the 8 sequential `/api/projects/{id}/stats` requests. Can be reconstructed from `list_network_requests` output in any bug 1 transcript.
+3. **Error card (bug 3)** — the "Something went wrong" error boundary on the Data Pipeline project card. Visible in any bug 3 screenshot.
+4. **Safari "No active tab" error** — the error message returned before the first navigation. From `trackA-safari-bug1-r0` transcript.
+5. **Chrome performance trace crash** — the `MCP error -32000: Connection closed` message from `trackA-chrome-bug4-r0`.
+6. **React profiler commit report** — the 13,606-component re-render count from `trackB-chrome-layerA-r0`.
 
 ## 16. Limits of this test
 
+1. **Single model.** All runs used Claude Opus 4.6. Results may differ substantially with other models (GPT-4, Gemini, etc.) or even other Claude model tiers.
+
+2. **Single machine.** Apple M4, 16 GB RAM. Browser performance characteristics (especially Safari's 30-second JS eval timeout) may differ on other hardware or OS versions.
+
+3. **RUNS_PER_CELL = 1.** Originally planned at 3, reduced to 1 due to wall-clock constraints. Statistical significance is low — a single lucky or unlucky run can dominate a cell. The parse errors further reduce coverage.
+
+4. **Known bugs, known grader.** The bugs were planted by the test author, who also wrote the grading keywords. This creates bias toward bugs that match the grader's vocabulary. An agent that diagnoses the bug correctly but uses unexpected terminology could score 0.
+
+5. **No headless mode.** All runs used headed browsers. Headless mode might change performance characteristics (especially for Chrome's performance traces).
+
+6. **agent-react-devtools was unreachable.** Layer B was effectively a dead letter — the CLI binary wasn't on PATH. This makes the Layer B comparison meaningless in practice. A fair test would require the CLI to actually work.
+
+7. **Contamination in some Layer B runs.** Three runs used Bash commands (cat, which, ls) alongside browser tools. These runs are flagged but their inclusion in any scoring should be noted.
+
+8. **No baseline without MCP.** We did not run "Claude Code with filesystem tools only, no browser MCP" as a baseline. It's possible that for some bugs (especially bug 4), reading source code directly via filesystem tools would outperform any browser MCP.
+
+9. **Fixed bug difficulty.** All four bugs are discoverable through browser developer tools by a competent human in minutes. The benchmark does not test bugs that require sophisticated profiling, memory analysis, or multi-session debugging.
+
+10. **Parse errors are opaque.** Eight runs produced no `result` event. The harness treats these as failures but doesn't distinguish between timeouts, crashes, and MCP connection issues. Manual transcript review is needed to understand each failure mode.
+
 ## 17. How to reproduce
+
+### Prerequisites
+- macOS with Safari 27+ (for Safari track)
+- Node.js 22+, npm 10+
+- Claude Code CLI installed (`~/.claude/local/node_modules/.bin/claude`)
+- Chrome 154+, Firefox 157+
+
+### Steps
+
+```bash
+# 1. Clone the repo
+git clone <repo-url> browser-mcp-bench
+cd browser-mcp-bench
+
+# 2. Install and start the app
+cd app
+npm install
+npm run dev          # plain mode (Track A: Chrome, Firefox, Safari)
+# npm run dev:cdt    # CDT mode (Track B: Layer A)
+# npm run dev:ard    # ARD mode (Track B: Layer B)
+
+# 3. Run the full matrix (from repo root)
+cd ..
+node harness/run.mjs --all
+
+# 4. Summarize and grade
+node harness/summarize.mjs
+node harness/grade.mjs
+
+# 5. Results
+cat results/summary.json   # per-run metrics
+cat results/grades.json    # per-run scores
+```
+
+### Configuration
+
+Edit `harness/config.mjs`:
+```javascript
+export const RUNS_PER_CELL = 1;      // runs per (browser, bug) pair
+export const MAX_TURNS = 40;          // Claude Code turn limit
+export const WALL_CLOCK_MINUTES = 8;  // timeout per run
+export const APP_URL = 'http://localhost:5173';
+```
+
+MCP server configs are in `harness/mcp-configs/`:
+- `chrome.json` — chrome-devtools-mcp with `--isolated --no-usage-statistics --no-performance-crux`
+- `chrome-react.json` — same + `--categoryExperimentalThirdParty=true`
+- `firefox.json` — firefox-devtools-mcp with `--tool-preset developer --viewport 1280x720`
+- `safari.json` — `/usr/bin/safaridriver --mcp`
+
+### Key flags for Claude Code
+
+```bash
+claude -p "<prompt>" \
+  --output-format stream-json \
+  --verbose \
+  --tools "" \
+  --allowedTools "mcp__<server>__*" \
+  --mcp-config harness/mcp-configs/<browser>.json \
+  --strict-mcp-config \
+  --permission-mode dontAsk
+```
+
+The `--tools ""` flag disables all built-in tools (Read, Bash, Grep, etc.), ensuring the agent can only use MCP tools. `--strict-mcp-config` prevents project-level MCP configs from loading. `--permission-mode dontAsk` auto-approves all MCP tool calls.
